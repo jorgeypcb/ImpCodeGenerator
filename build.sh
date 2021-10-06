@@ -16,5 +16,5 @@ else
 fi
 
 # build project in $project_root/build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER="${compiler}" "${@}"
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER="${compiler}" "${@}"
 cmake --build . --config Release
