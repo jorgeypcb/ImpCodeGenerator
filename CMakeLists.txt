@@ -1,45 +1,129 @@
-# Requirements
 cmake_minimum_required(VERSION 3.14)
 
-################################
-## Section 1: Declare project ##
-################################
-set(project_name cs554_warmup)
-set(libname "${project_name}")
-project(${project_name} CXX)
+project(
+    "Imp"
+    VERSION 1.0.0
+    DESCRIPTION "Code Generator for IMP language, written in C++"
+    HOMEPAGE_URL "https://github.com/codeinred/Imp/"
+    LANGUAGES CXX
+)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED 17)
-include("${CMAKE_CURRENT_SOURCE_DIR}/helper.cmake")
+add_library(Imp INTERFACE)
+add_library(Imp::Imp ALIAS Imp)
 
-###################################
-## Section 2: Project CMake code ##
-###################################
+# For ${CMAKE_INSTALL_<DIR>} variables that are standarized
+include(GNUInstallDirs)
 
-# Add library and register compile options
-add_library(${libname} INTERFACE)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+target_compile_features(
+    Imp
+    INTERFACE
+    cxx_std_20
+)
 
 target_include_directories(
-    ${libname}
+    Imp
     INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>
-    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# Installation
+# See: https://dominikberner.ch/cmake-interface-lib/
+
+install(
+    TARGETS Imp
+    EXPORT Imp_Targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "ImpConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/ImpConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
 )
 
 install(
-    DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-    DESTINATION include
+    EXPORT Imp_Targets
+    FILE ImpTargets.cmake
+    NAMESPACE Imp::
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
 )
 
-if(PROJECT_IS_TOP_LEVEL)
-    set(BENCHMARK_ENABLE_TESTING OFF)
-    find_or_fetch(fmt "https://github.com/fmtlib/fmt.git" master)
-    # find_or_fetch(benchmark "https://github.com/google/benchmark.git" main)
+install(FILES "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
+              "${PROJECT_BINARY_DIR}/ImpConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
+)
 
-    add_source_dir(src ${libname} fmt)
-    # add_source_dir(bench ${libname} benchmark)
-    # add_test_dir(test ${libname} fmt)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/Imp
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+
+include(helper)
+if(PROJECT_IS_TOP_LEVEL)
+    include(CTest)
+
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+
+    # Add all files in directory test as tests, and link against Imp and
+    # threads
+
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    #    target_compile_options(
+    #        test_kilo_tuple
+    #        PRIVATE
+    #        -fbracket-depth=1000)
+    #endif()
+
+    set(BENCHMARK_ENABLE_TESTING OFF)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+    set(BENCHMARK_DOWNLOAD_DEPENDENCIES OFF)
+
+    # Find the benchmark library, or download it in build/_deps
+    find_or_fetch(
+        benchmark
+        https://github.com/google/benchmark.git
+        main)
+    find_or_fetch(
+        fmt
+        https://github.com/fmtlib/fmt.git
+        master)
+    always_fetch(
+        Catch2
+        https://github.com/catchorg/catch2.git
+        devel)
+    FetchContent_MakeAvailable(${remote_dependencies})
+
+    add_source_dir(
+        bench
+        Imp
+        benchmark)
+    add_executable(
+        test_Imp
+        test2/test_Imp.cpp)
+    target_link_libraries(
+        test_Imp
+        Imp::Imp
+        fmt::fmt
+        Catch2::Catch2WithMain)
+
+    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+    include(CTest)
+    include(Catch)
+    catch_discover_tests(test_Imp)
 endif()
 
-# Add install target for execute
-install(TARGETS execute RUNTIME DESTINATION bin)
+
