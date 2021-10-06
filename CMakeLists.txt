@@ -70,8 +70,14 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/Imp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-
 include(helper)
+
+find_or_fetch(
+    noam
+    https://github.com/codeinred/noam.git
+    main)
+target_link_libraries(Imp INTERFACE noam::noam)
+
 if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
 
@@ -116,6 +122,7 @@ if(PROJECT_IS_TOP_LEVEL)
         test/test_imp.cpp)
     target_link_libraries(
         test_imp
+        noam::noam
         Imp::Imp
         fmt::fmt
         Catch2::Catch2WithMain)
