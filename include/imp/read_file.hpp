@@ -16,7 +16,7 @@ std::string read_file(const std::string& path) {
 
     stat(path.c_str(), &sb);
     res.resize(sb.st_size);
-    fread(const_cast<char*>(res.data()), sb.st_size, 1, input_file);
+    fread(res.data(), sb.st_size, 1, input_file);
     fclose(input_file);
 
     return res;
