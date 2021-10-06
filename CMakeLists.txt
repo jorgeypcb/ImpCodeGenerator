@@ -113,7 +113,7 @@ if(PROJECT_IS_TOP_LEVEL)
         benchmark)
     add_executable(
         test_Imp
-        test2/test_Imp.cpp)
+        test/test_Imp.cpp)
     target_link_libraries(
         test_Imp
         Imp::Imp
