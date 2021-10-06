@@ -112,10 +112,10 @@ if(PROJECT_IS_TOP_LEVEL)
         Imp
         benchmark)
     add_executable(
-        test_Imp
-        test/test_Imp.cpp)
+        test_imp
+        test/test_imp.cpp)
     target_link_libraries(
-        test_Imp
+        test_imp
         Imp::Imp
         fmt::fmt
         Catch2::Catch2WithMain)
@@ -123,7 +123,7 @@ if(PROJECT_IS_TOP_LEVEL)
     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
     include(CTest)
     include(Catch)
-    catch_discover_tests(test_Imp)
+    catch_discover_tests(test_imp)
 endif()
 
 
