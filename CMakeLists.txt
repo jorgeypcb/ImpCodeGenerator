@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(
     "Imp"
-    VERSION 1.0.0
+    VERSION 0.0.1
     DESCRIPTION "Code Generator for IMP language, written in C++"
     HOMEPAGE_URL "https://github.com/codeinred/Imp/"
     LANGUAGES CXX
