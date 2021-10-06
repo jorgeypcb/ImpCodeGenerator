@@ -6,17 +6,17 @@ output is the number of steps, in "output"
 n := input;
 steps := 0;
 while n > 1 do
-rem := n; --Here we divide n by 2:
-quot := 0;
-while rem > 1 do
-rem := rem - 2;
-quot := quot + 1
-od;
-if rem = 0 then
-n := quot
-else
-n := 3*n+1
-fi;
-steps := steps + 1
+  rem := n; --Here we divide n by 2:
+  quot := 0;
+  while rem > 1 do
+    rem := rem - 2;
+    quot := quot + 1
+  od;
+  if rem = 0 then
+    n := quot
+  else
+    n := 3*n+1
+  fi;
+  steps := steps + 1
 od;
 output := steps
