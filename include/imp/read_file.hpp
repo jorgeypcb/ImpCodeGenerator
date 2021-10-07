@@ -2,6 +2,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <system_error>
 
 // adapted from https://www.delftstack.com/howto/cpp/read-file-into-string-cpp/
 namespace imp {
@@ -11,7 +12,7 @@ std::string read_file(const std::string& path) {
 
     FILE* input_file = fopen(path.c_str(), "r");
     if (input_file == nullptr) {
-        perror("fopen");
+        std::system_error(errno);
     }
 
     stat(path.c_str(), &sb);
