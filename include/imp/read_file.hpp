@@ -12,7 +12,7 @@
 namespace imp {
 namespace fs = std::filesystem;
 
-std::string read_file(const std::string& path) {
+std::string read_file(const fs::path& path) {
     FILE* input_file = fopen(path.c_str(), "r");
 
     // When on_exit gets destroyed, it will close the input file
@@ -23,7 +23,7 @@ std::string read_file(const std::string& path) {
 
     // If input_file is nullptr, we need to throw an exception
     if (input_file == nullptr) {
-        throw std::system_error(errno, std::system_category(),path);
+        throw std::system_error(errno, std::system_category(), path);
     }
 
     // Get the size of the file
@@ -36,14 +36,15 @@ std::string read_file(const std::string& path) {
         if (int at_eof = feof(input_file)) {
             clearerr(input_file);
             throw std::runtime_error(
-                "Unable to read all bytes in" + path + ". EOF reached early.");
+                "Unable to read all bytes in" + path.string()
+                + ". EOF reached early.");
         }
         if (int error_code = ferror(input_file)) {
             clearerr(input_file);
             throw std::system_error(
                 error_code,
                 std::system_category(),
-                "Error when reading " + path);
+                "Error when reading " + path.string());
         }
     }
 
