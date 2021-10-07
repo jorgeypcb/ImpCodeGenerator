@@ -14,7 +14,7 @@ struct scope_guard {
 
     // ~scope_guard() will be noexcept if invoking on_exit() won't throw an
     // exception
-    ~scope_guard() noexcept(noexcept(on_exit())) { on_exit(); }
+    constexpr ~scope_guard() noexcept(noexcept(on_exit())) { on_exit(); }
 };
 
 template <class F>
