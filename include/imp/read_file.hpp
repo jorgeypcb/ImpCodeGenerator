@@ -12,7 +12,7 @@ std::string read_file(const std::string& path) {
 
     FILE* input_file = fopen(path.c_str(), "r");
     if (input_file == nullptr) {
-        std::system_error(errno);
+        throw std::system_error(errno, std::system_category(),path);
     }
 
     stat(path.c_str(), &sb);
