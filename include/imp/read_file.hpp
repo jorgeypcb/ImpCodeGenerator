@@ -5,11 +5,19 @@
 #include <string>
 #include <system_error>
 
+#include <imp/util/scope_guard.hpp>
+
 namespace imp {
 namespace fs = std::filesystem;
 
 std::string read_file(const std::string& path) {
     FILE* input_file = fopen(path.c_str(), "r");
+
+    // When on_exit gets destroyed, it will close the input file
+    scope_guard on_exit {[=] {
+        if (input_file)
+            fclose(input_file);
+    }};
 
     // If input_file is nullptr, we need to throw an exception
     if (input_file == nullptr) {
@@ -36,7 +44,6 @@ std::string read_file(const std::string& path) {
                 "Error when reading " + path);
         }
     }
-    fclose(input_file);
 
     return res;
 }
