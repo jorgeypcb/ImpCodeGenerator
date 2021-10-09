@@ -13,7 +13,7 @@ constexpr parser multiline_comment {
             if (found == st.npos) {
                 return {};
             }
-            return {st.substr(found + 2), st.substr(2, found)};
+            return {st.substr(found + 2), st.substr(2, found - 2)};
         } else {
             return {};
         }
@@ -26,7 +26,7 @@ constexpr parser singleline_comment {
             if (found == st.npos) {
                 return {};
             }
-            return {st.substr(found + 1), st.substr(2, found)};
+            return {st.substr(found + 1), st.substr(2, found - 2)};
         } else {
             return {};
         }
