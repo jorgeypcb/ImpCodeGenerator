@@ -84,25 +84,7 @@ if(PROJECT_IS_TOP_LEVEL)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
-    # Add all files in directory test as tests, and link against Imp and
-    # threads
-
-    #if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    #    target_compile_options(
-    #        test_kilo_tuple
-    #        PRIVATE
-    #        -fbracket-depth=1000)
-    #endif()
-
-    set(BENCHMARK_ENABLE_TESTING OFF)
-    set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
-    set(BENCHMARK_DOWNLOAD_DEPENDENCIES OFF)
-
-    # Find the benchmark library, or download it in build/_deps
-    find_or_fetch(
-        benchmark
-        https://github.com/google/benchmark.git
-        main)
+    # Add all files in directory test as tests, and link against Imp
     find_or_fetch(
         fmt
         https://github.com/fmtlib/fmt.git
