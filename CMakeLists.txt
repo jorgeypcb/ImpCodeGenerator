@@ -76,7 +76,11 @@ find_or_fetch(
     noam
     https://github.com/codeinred/noam.git
     main)
-target_link_libraries(Imp INTERFACE noam::noam)
+find_or_fetch(
+    rva
+    https://github.com/codeinred/recursive-variant.git
+    main)
+target_link_libraries(Imp INTERFACE noam::noam rva::rva)
 
 if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
