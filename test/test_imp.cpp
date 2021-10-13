@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+
 #include <imp/comment.hpp>
 #include <imp/read_file.hpp>
+#include <imp/syntax_types.hpp>
+
 #include <noam/combinators.hpp>
 #include <system_error>
 
