@@ -81,6 +81,9 @@ find_or_fetch(
     https://github.com/codeinred/recursive-variant.git
     main)
 target_link_libraries(Imp INTERFACE noam::noam rva::rva)
+
+# The standard for the whole project should be set to C++20 so that Catch2
+# builds with C++20. This will prevent linking errors.
 set(CMAKE_CXX_STANDARD 20)
 if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
