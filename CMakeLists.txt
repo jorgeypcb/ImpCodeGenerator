@@ -81,7 +81,7 @@ find_or_fetch(
     https://github.com/codeinred/recursive-variant.git
     main)
 target_link_libraries(Imp INTERFACE noam::noam rva::rva)
-
+set(CMAKE_CXX_STANDARD 20)
 if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
 
