@@ -28,6 +28,12 @@ struct unary_expr {
         char op;
     };
     std::unique_ptr<expr_data> data_ptr;
+    T const& get_input() const {
+        return data_ptr->value;
+    }
+    char get_op() const {
+        return data_ptr->op;
+    }
 };
 template <class T>
 struct binary_expr {
@@ -58,6 +64,15 @@ struct if_command {
         Cmd when_false;
     };
     std::unique_ptr<data> data_ptr;
+    BExpr const& get_condition() const {
+        return data_ptr->condition;
+    }
+    Cmd const& when_true() const {
+        return data_ptr->when_true;
+    }
+    Cmd const& when_false() const {
+        return data_ptr->when_false;
+    }
 };
 template <class BExpr, class Cmd>
 struct while_loop {
@@ -66,6 +81,12 @@ struct while_loop {
         Cmd body;
     };
     std::unique_ptr<data> data_ptr;
+    BExpr const& get_condition() const {
+        return data_ptr->condition;
+    }
+    Cmd const& get_body() const {
+        return data_ptr->body;
+    }
 };
 template <class Expr>
 struct assignment {
