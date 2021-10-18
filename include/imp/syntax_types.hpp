@@ -13,7 +13,12 @@ struct constant {
 struct bool_const {
     bool value;
 };
-struct variable : std::string_view {};
+struct variable {
+    std::string_view name;
+    std::string_view get_name() const {
+        return name;
+    }
+};
 struct comment : std::string_view {};
 
 template <class T>
@@ -32,6 +37,16 @@ struct binary_expr {
         char op;
     };
     std::unique_ptr<expr_data> data_ptr;
+
+    T const& get_left() const {
+        return data_ptr->left;
+    }
+    T const& get_right() const {
+        return data_ptr->right;
+    }
+    char get_op() const {
+        return data_ptr->op;
+    }
 };
 struct skip_command {};
 
