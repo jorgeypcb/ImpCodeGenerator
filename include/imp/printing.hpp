@@ -4,7 +4,8 @@
 #include <fmt/core.h>
 
 namespace imp {
-// I copied the definitions here so they're easily accessible
+// I copied the definitions here so that we could reference them while implementing
+// printing
 using arith_expr = rva::variant<
     constant,                  // Integral constant
     variable,                  // Variable
