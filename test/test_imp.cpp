@@ -3,6 +3,7 @@
 #include <imp/comment.hpp>
 #include <imp/read_file.hpp>
 #include <imp/syntax_types.hpp>
+#include <imp/printing.hpp>
 
 #include <noam/combinators.hpp>
 #include <system_error>
