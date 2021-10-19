@@ -1,6 +1,20 @@
 # Project1-SimpleCodeGeneration
 
+## Building
+
+Build via:
+
+```bash
+./build.sh
+```
+
+This will invoke CMake and download any dependcies that aren't found on the
+system.
+
+## Example
+
 Output of running `build/example`, which prints the syntax tree:
+
 ```
 x = 10;
 y = 20;
@@ -11,6 +25,7 @@ done
 ```
 
 Corresponding syntax tree:
+
 ```cpp
 command comm = command {
     std::vector<command> {
@@ -80,4 +95,3 @@ compiled with gcc, and then run on either the SiFive board
   program in C, which you will also generate.
 - Task 4: Extensively test your compiler. Write test programs to demonstrate
   complete coverage of language features.
-
