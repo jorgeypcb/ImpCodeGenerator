@@ -23,8 +23,31 @@ int main() {
                         }                   // <br>
                     }                       // <br>
                 }                           // <br>
-            }                               // <br>
-        }                                   // <br>
+            },                              // <br>
+            while_loop<bool_expr, command> {
+                while_loop<bool_expr, command>::data {
+                    binary_expr<arith_expr> {
+                        binary_expr<arith_expr>::expr_data {
+                            variable {"x"}, // <br>
+                            variable {"y"}, // <br>
+                            '>'             // <br>
+                        }                   // <br>
+                    },                      // <br>
+                    assignment<arith_expr> {
+                        variable {"x"}, // <br>
+                        arith_expr {
+                            binary_expr<arith_expr> {
+                                binary_expr<arith_expr>::expr_data {
+                                    variable {"x"}, // <br>
+                                    constant {1},   // <br>
+                                    '+'             // <br>
+                                }                   // <br>
+                            }                       // <br>
+                        }                           // <br>
+                    },                              // <br>
+                }                                   // <br>
+            }                                       // <br>
+        }                                           // <br>
     };
 
     print_expr(comm);
