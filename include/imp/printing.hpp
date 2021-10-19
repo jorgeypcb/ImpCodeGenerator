@@ -35,7 +35,7 @@ void print_expr(variable const& v) {
 }
 void print_expr(binary_expr<arith_expr> const& expr) {
     print_expr(expr.get_left());
-    fmt::print("{}", expr.get_op());
+    fmt::print(" {} ", expr.get_op());
     print_expr(expr.get_right());
 }
 
@@ -65,7 +65,7 @@ void print_expr(unary_expr<bool_expr> const& ue) {
 //same as print_expr(binary_expr<arith_expr>)
 void print_expr(binary_expr<bool_expr> const& be) {
     print_expr(be.get_left());
-    fmt::print("{}", be.get_op());
+    fmt::print(" {} ", be.get_op());
     print_expr(be.get_right());
 }
 
@@ -85,21 +85,29 @@ void print_expr(assignment<arith_expr> const& a) {
     print_expr(a.dest);
     fmt::print(" = ");
     print_expr(a.value);
+    fmt::print(";");
 }
 
 void print_expr(skip_command const& s) {
-    fmt::print("skip_command");
+    fmt::print("skip;");
 }
 
 void print_expr(if_command<bool_expr, command> const& ic) {
-    print_expr(ic.when_true());
-    print_expr(ic.when_false());
+    fmt::print("if ");
     print_expr(ic.get_condition());
+    fmt::print(" then\n");
+    print_expr(ic.when_true());
+    fmt::print("\nelse\n");
+    print_expr(ic.when_false());
+    fmt::print("fi\n");
 }
 
 void print_expr(while_loop<bool_expr, command> const& wl) {
+    fmt::print("while ");
     print_expr(wl.get_condition());
+    fmt::print(" do \n");
     print_expr(wl.get_body());
+    fmt::print("\ndone\n");
 }
 void print_expr(std::vector<command> const& commands) {
     for(auto const& cmd : commands) {
