@@ -69,7 +69,7 @@ command comm = command {
                             }
                         }
                     }
-                },
+                }
             }
         }
     }
