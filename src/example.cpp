@@ -16,7 +16,7 @@ int main() {
                 variable {"z"}, // <br>
                 arith_expr {
                     binary_expr<arith_expr> {
-                        binary_expr<arith_expr>::expr_data {
+                        binary_expr<arith_expr>::data {
                             variable {"x"}, // <br>
                             variable {"y"}, // <br>
                             '+'             // <br>
@@ -27,7 +27,7 @@ int main() {
             while_loop<bool_expr, command> {
                 while_loop<bool_expr, command>::data {
                     binary_expr<arith_expr> {
-                        binary_expr<arith_expr>::expr_data {
+                        binary_expr<arith_expr>::data {
                             variable {"x"}, // <br>
                             variable {"y"}, // <br>
                             '>'             // <br>
@@ -37,7 +37,7 @@ int main() {
                         variable {"x"}, // <br>
                         arith_expr {
                             binary_expr<arith_expr> {
-                                binary_expr<arith_expr>::expr_data {
+                                binary_expr<arith_expr>::data {
                                     variable {"x"}, // <br>
                                     constant {1},   // <br>
                                     '+'             // <br>

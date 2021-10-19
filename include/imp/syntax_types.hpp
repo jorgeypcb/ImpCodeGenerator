@@ -38,12 +38,12 @@ struct unary_expr {
 };
 template <class T>
 struct binary_expr {
-    struct expr_data {
+    struct data {
         T left;
         T right;
         char op;
     };
-    copyable_ptr<expr_data> data_ptr;
+    copyable_ptr<data> data_ptr;
 
     T const& get_left() const {
         return data_ptr->left;
