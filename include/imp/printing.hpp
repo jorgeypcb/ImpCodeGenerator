@@ -2,7 +2,7 @@
 
 #include <imp/syntax_types.hpp>
 #include <fmt/core.h>
- 
+
 namespace imp {
 // I copied the definitions here so that we could reference them while implementing
 // printing
@@ -59,7 +59,7 @@ void print_expr(bool_const const& bc) {
 
 void print_expr(unary_expr<bool_expr> const& ue) {
     print_expr(ue.get_input());
-    print_expr(ue.get_op);
+    fmt::print("{}", ue.get_op());
 }
 
 //same as print_expr(binary_expr<arith_expr>)
@@ -69,20 +69,21 @@ void print_expr(binary_expr<bool_expr> const& be) {
     print_expr(be.get_right());
 }
 
-//print_expr(binary_expr<arith_expr>) already exists - 
+//print_expr(binary_expr<arith_expr>) already exists -
 //need another print_expr for the fourth case in bool_expr (binary_expr<arith_expr>) ??
 
-void print_expr(binary_expr const& expr) {
+void print_expr(bool_expr const& expr) {
     auto visitor = [](auto const& v) { print_expr(v); };
     rva::visit(visitor,expr);
 }
 
 //////// COMMAND //////////
+
 void print_expr(command const& expr);
 
 void print_expr(assignment<arith_expr> const& a) {
-    fmt::print("{}", a.dest);
-    fmt::print("{}", a.value);
+    print_expr(a.dest);
+    print_expr(a.value);
 }
 
 void print_expr(skip_command const& s) {
@@ -95,7 +96,7 @@ void print_expr(if_command<bool_expr, command> const& ic) {
     print_expr(ic.get_condition());
 }
 
-void print_expr(while_loop<bool_expr, command, std::vector<command>>) const& wl) {
+void print_expr(while_loop<bool_expr, command> const& wl) {
     print_expr(wl.get_condition());
     print_expr(wl.get_body());
 }
