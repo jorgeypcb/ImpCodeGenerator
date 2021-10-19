@@ -80,7 +80,11 @@ find_or_fetch(
     rva
     https://github.com/codeinred/recursive-variant.git
     main)
-target_link_libraries(Imp INTERFACE noam::noam rva::rva)
+find_or_fetch(
+    fmt
+    https://github.com/fmtlib/fmt.git
+    master)
+target_link_libraries(Imp INTERFACE noam::noam rva::rva fmt::fmt)
 
 # The standard for the whole project should be set to C++20 so that Catch2
 # builds with C++20. This will prevent linking errors.
@@ -93,10 +97,6 @@ if(PROJECT_IS_TOP_LEVEL)
 
     # Add all files in directory test as tests, and link against Imp
     find_or_fetch(
-        fmt
-        https://github.com/fmtlib/fmt.git
-        master)
-    find_or_fetch(
         Catch2
         https://github.com/catchorg/catch2.git
         devel
@@ -104,17 +104,14 @@ if(PROJECT_IS_TOP_LEVEL)
     FetchContent_MakeAvailable(${remote_dependencies})
 
     add_source_dir(
-        bench
-        Imp
-        benchmark)
+        src
+        Imp::Imp)
     add_executable(
         test_imp
         test/test_imp.cpp)
     target_link_libraries(
         test_imp
-        noam::noam
         Imp::Imp
-        fmt::fmt
         Catch2::Catch2WithMain)
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake/Catch2)
