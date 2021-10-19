@@ -83,6 +83,7 @@ void print_expr(command const& expr);
 
 void print_expr(assignment<arith_expr> const& a) {
     print_expr(a.dest);
+    fmt::print(" = ");
     print_expr(a.value);
 }
 
@@ -99,6 +100,12 @@ void print_expr(if_command<bool_expr, command> const& ic) {
 void print_expr(while_loop<bool_expr, command> const& wl) {
     print_expr(wl.get_condition());
     print_expr(wl.get_body());
+}
+void print_expr(std::vector<command> const& commands) {
+    for(auto const& cmd : commands) {
+        print_expr(cmd);
+        fmt::print("\n");
+    }
 }
 
 void print_expr(command const& expr) {
