@@ -1,4 +1,6 @@
-# Project1-SimpleCodeGeneration
+# Imp Code Generator
+
+A simple compiler for the IMP programming language
 
 ## Building
 
