@@ -5,6 +5,7 @@
 #include <rva/variant.hpp>
 #include <string_view>
 
+#include <imp/copyable_ptr.hpp>
 
 namespace imp {
 struct constant {
@@ -27,7 +28,7 @@ struct unary_expr {
         T value;
         char op;
     };
-    std::unique_ptr<expr_data> data_ptr;
+    copyable_ptr<expr_data> data_ptr;
     T const& get_input() const {
         return data_ptr->value;
     }
@@ -42,7 +43,7 @@ struct binary_expr {
         T right;
         char op;
     };
-    std::unique_ptr<expr_data> data_ptr;
+    copyable_ptr<expr_data> data_ptr;
 
     T const& get_left() const {
         return data_ptr->left;
@@ -63,7 +64,7 @@ struct if_command {
         Cmd when_true;
         Cmd when_false;
     };
-    std::unique_ptr<data> data_ptr;
+    copyable_ptr<data> data_ptr;
     BExpr const& get_condition() const {
         return data_ptr->condition;
     }
@@ -80,7 +81,7 @@ struct while_loop {
         BExpr condition;
         Cmd body;
     };
-    std::unique_ptr<data> data_ptr;
+    copyable_ptr<data> data_ptr;
     BExpr const& get_condition() const {
         return data_ptr->condition;
     }
@@ -127,4 +128,17 @@ using command = rva::variant<
     if_command<bool_expr, rva::self_t>, // If statement
     while_loop<bool_expr, rva::self_t>, // while loop
     std::vector<rva::self_t>>;          // List of commands separated by ;
+
+static_assert(std::is_copy_constructible_v<arith_expr>);
+static_assert(std::is_copy_constructible_v<bool_expr>);
+static_assert(std::is_copy_constructible_v<command>);
+static_assert(std::is_move_constructible_v<arith_expr>);
+static_assert(std::is_move_constructible_v<bool_expr>);
+static_assert(std::is_move_constructible_v<command>);
+static_assert(std::is_copy_assignable_v<arith_expr>);
+static_assert(std::is_copy_assignable_v<bool_expr>);
+static_assert(std::is_copy_assignable_v<command>);
+static_assert(std::is_move_assignable_v<arith_expr>);
+static_assert(std::is_move_assignable_v<bool_expr>);
+static_assert(std::is_move_assignable_v<command>);
 } // namespace imp
