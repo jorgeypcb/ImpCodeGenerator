@@ -15,65 +15,12 @@ system.
 
 Output of running `build/example`, which prints the syntax tree:
 
-```
-x = 10;
-y = 20;
-z = x + y;
-while x > y do
-x = x + 1;
-done
-```
+![](docs/ast-example-output.png)
 
 Corresponding syntax tree:
 
-```cpp
-command comm = command {
-    std::vector<command> {
-        assignment<arith_expr> {
-            variable {"x"},
-            constant {10}
-        },
-        assignment<arith_expr> {
-            variable {"y"},
-            constant {20}
-        },
-        assignment<arith_expr> {
-            variable {"z"},
-            arith_expr {
-                binary_expr<arith_expr> {
-                    binary_expr<arith_expr>::expr_data {
-                        variable {"x"},
-                        variable {"y"},
-                        '+'
-                    }
-                }
-            }
-        },
-        while_loop<bool_expr, command> {
-            while_loop<bool_expr, command>::data {
-                binary_expr<arith_expr> {
-                    binary_expr<arith_expr>::expr_data {
-                        variable {"x"},
-                        variable {"y"},
-                        '>'
-                    }
-                },
-                assignment<arith_expr> {
-                    variable {"x"},
-                    arith_expr {
-                        binary_expr<arith_expr> {
-                            binary_expr<arith_expr>::expr_data {
-                                variable {"x"},
-                                constant {1},
-                                '+'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-};
+![](docs/ast-example.png)
+
 ```
 
 ## Summary of project
