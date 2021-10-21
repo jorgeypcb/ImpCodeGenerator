@@ -4,12 +4,15 @@
 #include <fmt/core.h>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 namespace imp{
-    
+using std::string;
+using std::ostream;
+
 void print_command(command const& cmd, std::ofstream out);
 
-void ast_to_file(string fname, rva::command const& ast) {
+void ast_to_file(string fname, command const& ast) {
     std::ofstream dotfile;
     int new_node = 0;
     dotfile.open (fname + ".dot");
@@ -20,14 +23,14 @@ void ast_to_file(string fname, rva::command const& ast) {
     dotfile.close();
 }
 
-ostream& operator<<(ostream& os, rva::command const& ast) {return os; };
+ostream& operator<<(ostream& os, command const& ast) {return os; };
 
-ostream& operator<<(ostream& os, assignment<arigh_expr> const& a) {
+ostream& operator<<(ostream& os, assignment<arith_expr> const& a) {
     os << a.dest << "->" << a.value;
 }
 
 void print_command(assignment<arith_expr> const& a, std::ofstream out) {
-    out << a.dest << "->" << a.value; ///NEED TO FORMAT THIS TO GRAPHVIZ 
+    out << a.dest << "->" << a.value; ///NEED TO FORMAT THIS TO GRAPHVIZ
 }
 
 } //namespace imp
