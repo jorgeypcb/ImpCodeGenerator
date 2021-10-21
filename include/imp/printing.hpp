@@ -6,7 +6,8 @@
 namespace imp {
 
 // Declare it ahead of time so we can use it in other functions
-void print_expr(arith_expr const& expr);
+// The function itself could just go here b/c templates
+void print_expr(auto const& expr);
 
 void print_expr(constant const& c) {
     fmt::print("{}", c.value);
@@ -21,7 +22,6 @@ void print_expr(binary_expr<arith_expr> const& expr) {
 }
 
 ////// BOOL EXPR //////////
-void print_expr(bool_expr const& expr);
 
 void print_expr(bool_const const& bc) {
     fmt::print("{}", bc.value);
@@ -43,8 +43,6 @@ void print_expr(binary_expr<bool_expr> const& be) {
 //need another print_expr for the fourth case in bool_expr (binary_expr<arith_expr>) ??
 
 //////// COMMAND //////////
-
-void print_expr(command const& expr);
 
 void print_expr(assignment<arith_expr> const& a) {
     print_expr(a.dest);

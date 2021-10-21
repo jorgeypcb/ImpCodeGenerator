@@ -12,7 +12,7 @@ add_library(Imp INTERFACE)
 add_library(Imp::Imp ALIAS Imp)
 
 # For ${CMAKE_INSTALL_<DIR>} variables that are standarized
-include(GNUInstallDirs)
+# include(GNUInstallDirs)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -33,42 +33,42 @@ target_include_directories(
 # Installation
 # See: https://dominikberner.ch/cmake-interface-lib/
 
-install(
-    TARGETS Imp
-    EXPORT Imp_Targets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+# install(
+#     TARGETS Imp
+#     EXPORT Imp_Targets
+#     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+# )
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "ImpConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
+# include(CMakePackageConfigHelpers)
+# write_basic_package_version_file(
+#     "ImpConfigVersion.cmake"
+#     VERSION ${PROJECT_VERSION}
+#     COMPATIBILITY SameMajorVersion
+# )
+#
+# configure_package_config_file(
+#     "${PROJECT_SOURCE_DIR}/cmake/ImpConfig.cmake.in"
+#     "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
+#     INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
+# )
 
-configure_package_config_file(
-    "${PROJECT_SOURCE_DIR}/cmake/ImpConfig.cmake.in"
-    "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
-)
+# install(
+#     EXPORT Imp_Targets
+#     FILE ImpTargets.cmake
+#     NAMESPACE Imp::
+#     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
+# )
 
-install(
-    EXPORT Imp_Targets
-    FILE ImpTargets.cmake
-    NAMESPACE Imp::
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
-)
-
-install(FILES "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
-              "${PROJECT_BINARY_DIR}/ImpConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
-)
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/Imp
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+# install(FILES "${PROJECT_BINARY_DIR}/ImpConfig.cmake"
+#               "${PROJECT_BINARY_DIR}/ImpConfigVersion.cmake"
+#         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Imp/cmake
+# )
+#
+# install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/Imp
+#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+# )
 
 include(helper)
 
