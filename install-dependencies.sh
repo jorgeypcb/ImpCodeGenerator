@@ -43,7 +43,8 @@ function install() {
         -DCMAKE_BUILD_TYPE=Release               \
         -DCMAKE_CXX_FLAGS="-std=c++20 -fPIE"     \
         -DBUILD_TESTING=OFF                      \
-        -DCMAKE_CXX_COMPILER="$compiler"
+        -DCMAKE_CXX_COMPILER="$compiler"         \
+        "${@:3}"
 
     cmake --build build -j 16
     
@@ -64,9 +65,8 @@ function uninstall() {
     rm -rf "$project"
 }
 
-
+# $cmd google    benchmark          -DBENCHMARK_ENABLE_TESTING=OFF
 $cmd catchorg  Catch2
 $cmd fmtlib    fmt
 $cmd codeinred tuplet
 $cmd codeinred recursive-variant
-
