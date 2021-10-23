@@ -1,6 +1,7 @@
 #pragma once
 
-#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <fstream>
 #include <imp/syntax_types.hpp>
 #include <iostream>
@@ -10,15 +11,33 @@ namespace imp {
 using std::ostream;
 using std::string;
 
+struct node_id {
+    size_t type_size;
+    size_t node_location;
+    template <class T>
+    node_id(T const& node) noexcept
+      : type_size(sizeof(T))
+      , node_location((size_t)&node) {}
+};
+
+ostream& operator<<(ostream& os, node_id n) {
+    os << "s" << n.type_size << "x" << n.node_location;
+    return os;
+}
+
 template <class T>
-size_t get_id(const T& anything) {
+node_id get_id(const T& anything) {
     std::cout << "Calling " << __PRETTY_FUNCTION__ << "\n\twith "
               << (size_t)&anything << " and " << sizeof(T) * 11 << '\n';
-    return (size_t)&anything + sizeof(T) * 11;
+    // This creates a unique identifier by combining the location of the
+    // variable in memory with the size of the type. This ensures that types
+    // that contain other types produce a unique identifier. Output is in
+    // hexadecimal for compactness.
+    return node_id(anything);
 }
 template <class... T>
-size_t get_id(const rva::variant<T...>& anything) {
-    auto visitor = [](auto const& x) -> size_t { return get_id(x); };
+node_id get_id(const rva::variant<T...>& anything) {
+    auto visitor = [](auto const& x) { return get_id(x); };
     return rva::visit(visitor, anything);
 }
 
@@ -51,7 +70,7 @@ void declare_nodes(ostream& os, assignment<arith_expr> const& node) {
 }
 
 void declare_nodes(ostream& os, binary_expr<arith_expr> const& node) {
-    os << get_id(node) << " [label = \"" << "binary_expr<arith_expr> " << node.get_op() << "\"];\n";
+    os << get_id(node) << " [label = \"" << node.get_op() << "\"];\n";
     declare_nodes(os, node.get_left());
     declare_nodes(os, node.get_right());
 }
@@ -206,7 +225,7 @@ void ast_to_dotfile(string fname, command const& ast) {
     dotfile << "digraph g { \n";
     declare_nodes(dotfile, ast);
     dotfile << ast;
-    dotfile << "\n}";
+    dotfile << "}";
     dotfile.close();
 }
 
