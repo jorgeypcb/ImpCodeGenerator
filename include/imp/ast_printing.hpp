@@ -31,8 +31,7 @@ node_id get_id(const T& anything) {
               << (size_t)&anything << " and " << sizeof(T) * 11 << '\n';
     // This creates a unique identifier by combining the location of the
     // variable in memory with the size of the type. This ensures that types
-    // that contain other types produce a unique identifier. Output is in
-    // hexadecimal for compactness.
+    // that contain other types produce a unique identifier.
     return node_id(anything);
 }
 template <class... T>
