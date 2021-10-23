@@ -68,5 +68,6 @@ function uninstall() {
 # $cmd google    benchmark          -DBENCHMARK_ENABLE_TESTING=OFF
 $cmd catchorg  Catch2
 $cmd fmtlib    fmt
+$cmd fastfloat fast_float
 $cmd codeinred tuplet
 $cmd codeinred recursive-variant
