@@ -11,13 +11,7 @@ using std::string;
 using std::ostream;
 
 
-ostream& operator<<(ostream& os, command const& expr) {
-    auto visitor = [&](auto const& v) { 
-        os << v; 
-    };
-    rva::visit(visitor, expr);
-    return os;
-}
+ostream& operator<<(ostream& os, command const& expr);
 
 void ast_to_dotfile(string fname, command const& ast) {
     std::ofstream dotfile;
@@ -31,6 +25,15 @@ void ast_to_dotfile(string fname, command const& ast) {
 
 ostream& operator<<(ostream& os, assignment<arith_expr> const& a) {
     os << "asdf";
+    return os;
+}
+
+ostream& operator<<(ostream& os, command const& expr) {
+    std::cout << "calling visitor\n";
+    auto visitor = [&](auto const& v) { 
+        os << v; 
+    };
+    rva::visit(visitor, expr);
     return os;
 }
 
