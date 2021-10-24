@@ -27,8 +27,6 @@ ostream& operator<<(ostream& os, node_id n) {
 
 template <class T>
 node_id get_id(const T& anything) {
-    std::cout << "Calling " << __PRETTY_FUNCTION__ << "\n\twith "
-              << (size_t)&anything << " and " << sizeof(T) * 11 << '\n';
     // This creates a unique identifier by combining the location of the
     // variable in memory with the size of the type. This ensures that types
     // that contain other types produce a unique identifier.
@@ -40,20 +38,11 @@ node_id get_id(const rva::variant<T...>& anything) {
     return rva::visit(visitor, anything);
 }
 
-// declare_nodes forward declarations
-
-
+// Forward declaration of declare_nodes and print_edges
 template <class... T>
 void declare_nodes(ostream& os, rva::variant<T...> const& node);
 template <class... T>
-ostream& operator<<(ostream& os, rva::variant<T...> const& expr);
-// void declare_nodes(ostream& os, arith_expr const& node);
-
-// void declare_nodes(ostream& os, binary_expr<arith_expr> const& node);
-
-// void declare_nodes(ostream& os, bool_expr const& node);
-
-// void declare_nodes(ostream& os, command const& node);
+void print_edges(ostream& os, rva::variant<T...> const& expr);
 
 // declare_node implementations
 void declare_nodes(ostream& os, constant const& node) {
@@ -74,22 +63,20 @@ void declare_nodes(ostream& os, binary_expr<arith_expr> const& node) {
     declare_nodes(os, node.get_right());
 }
 
-// os << get_id(node) << " [label = \"" <<  << "\"];\n";
 void declare_nodes(ostream& os, bool_const const& node) {
     os << get_id(node) << " [label = \"" << node.value << "\"];\n";
 }
 
-ostream& operator<<(ostream& os, bool_const const& a) { return os; }
+void print_edges(ostream& os, bool_const const& a) {}
 
 void declare_nodes(ostream& os, unary_expr<bool_expr> const& node) {
     os << get_id(node) << " [label = \"" << node.get_op() << "\"];\n";
     declare_nodes(os, node.get_input());
 }
 
-ostream& operator<<(ostream& os, unary_expr<bool_expr> const& a) {
-    os << get_id(a) << "->" << get_id(a.get_input()) << "\n";
-    os << a.get_input();
-    return os;
+void print_edges(ostream& os, unary_expr<bool_expr> const& a) {
+    os << get_id(a) << " -> " << get_id(a.get_input()) << "\n";
+    print_edges(os, a.get_input());
 }
 
 void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
@@ -98,12 +85,11 @@ void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
     declare_nodes(os, node.get_right());
 }
 
-ostream& operator<<(ostream& os, binary_expr<bool_expr> const& a) {
-    os << get_id(a) << "->" << get_id(a.get_left()) << "\n";
-    os << get_id(a) << "->" << get_id(a.get_right()) << "\n";
-    os << a.get_left();
-    os << a.get_right();
-    return os;
+void print_edges(ostream& os, binary_expr<bool_expr> const& a) {
+    os << get_id(a) << " -> " << get_id(a.get_left()) << "\n";
+    os << get_id(a) << " -> " << get_id(a.get_right()) << "\n";
+    print_edges(os, a.get_left());
+    print_edges(os, a.get_right());
 }
 
 void declare_nodes(ostream& os, const imp::skip_command& node) {
@@ -112,11 +98,11 @@ void declare_nodes(ostream& os, const imp::skip_command& node) {
        << "\"];\n";
 }
 
-ostream& operator<<(ostream& os, skip_command const& a) { return os; }
+void print_edges(ostream& os, skip_command const& a) {}
 
-ostream& operator<<(ostream& os, variable const& a) { return os; }
+void print_edges(ostream& os, variable const& a) {}
 
-ostream& operator<<(ostream& os, constant const& a) { return os; }
+void print_edges(ostream& os, constant const& a) {}
 
 void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
     os << get_id(node) << " [label = \""
@@ -127,14 +113,13 @@ void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
     declare_nodes(os, node.when_true());
 }
 
-ostream& operator<<(ostream& os, if_command<bool_expr, command> const& a) {
-    os << get_id(a) << "->" << get_id(a.get_condition()) << "\n";
-    os << get_id(a) << "->" << get_id(a.when_false()) << "\n";
-    os << get_id(a) << "->" << get_id(a.when_true()) << "\n";
-    os << a.get_condition();
-    os << a.when_false();
-    os << a.when_true();
-    return os;
+void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
+    os << get_id(a) << " -> " << get_id(a.get_condition()) << "\n";
+    os << get_id(a) << " -> " << get_id(a.when_false()) << "\n";
+    os << get_id(a) << " -> " << get_id(a.when_true()) << "\n";
+    print_edges(os, a.get_condition());
+    print_edges(os, a.when_false());
+    print_edges(os, a.when_true());
 }
 
 void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
@@ -145,12 +130,11 @@ void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
     declare_nodes(os, node.get_body());
 }
 
-ostream& operator<<(ostream& os, while_loop<bool_expr, command> const& a) {
-    os << get_id(a) << "->" << get_id(a.get_condition()) << "\n";
-    os << get_id(a) << "->" << get_id(a.get_body()) << "\n";
-    os << a.get_condition();
-    os << a.get_body();
-    return os;
+void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
+    os << get_id(a) << " -> " << get_id(a.get_condition()) << "\n";
+    os << get_id(a) << " -> " << get_id(a.get_body()) << "\n";
+    print_edges(os, a.get_condition());
+    print_edges(os, a.get_body());
 }
 
 void declare_nodes(ostream& os, std::vector<command> const& victor) {
@@ -162,70 +146,49 @@ void declare_nodes(ostream& os, std::vector<command> const& victor) {
 
 template <class... T>
 void declare_nodes(ostream& os, rva::variant<T...> const& node) {
-    std::cout << "declare nodes\n";
     auto visitor = [&](auto const& v) { declare_nodes(os, v); };
     rva::visit(visitor, node);
 }
-// void declare_nodes(ostream& os, arith_expr const& node) {
-//     std::cout << "declare nodes\n";
-//     auto visitor = [&](auto const& v) { declare_nodes(os, v); };
-//     rva::visit(visitor, node);
-// }
 
-// void declare_nodes(ostream& os, command const& node) {
-//     std::cout << "declare nodes\n";
-//     auto visitor = [&](auto const& v) { declare_nodes(os, v); };
-//     rva::visit(visitor, node);
-// }
-
-// operator<< forward declarations
-
-// operator<< implementations
-
-
-
-ostream& operator<<(ostream& os, binary_expr<arith_expr> const& a) {
-    os << get_id(a) << "->" << get_id(a.get_left()) << '\n';
-    os << get_id(a) << "->" << get_id(a.get_right()) << '\n';
-    os << a.get_left();
-    os << a.get_right();
-    return os;
+void print_edges(ostream& os, binary_expr<arith_expr> const& a) {
+    os << get_id(a) << " -> " << get_id(a.get_left()) << '\n';
+    os << get_id(a) << " -> " << get_id(a.get_right()) << '\n';
+    print_edges(os, a.get_left());
+    print_edges(os, a.get_right());
 }
 
-ostream& operator<<(ostream& os, assignment<arith_expr> const& a) {
-    os << get_id(a) << "->" << get_id(a.dest) << '\n';
-    os << get_id(a) << "->" << get_id(a.value) << '\n';
-    os << a.value;
-    return os;
+void print_edges(ostream& os, assignment<arith_expr> const& a) {
+    os << get_id(a) << " -> " << get_id(a.dest) << '\n';
+    os << get_id(a) << " -> " << get_id(a.value) << '\n';
+    print_edges(os, a.value);
 }
 
-ostream& operator<<(ostream& os, std::vector<command> const& victor) {
+void print_edges(ostream& os, std::vector<command> const& victor) {
     for (auto& item : victor) {
-        os << get_id(victor) << "->" << get_id(item) << "\n";
-        os << item;
+        os << get_id(victor) << " -> " << get_id(item) << "\n";
+        print_edges(os, item);
     }
-    return os;
 }
 
 template <class... T>
-ostream& operator<<(ostream& os, rva::variant<T...> const& expr) {
-    std::cout << "calling visitor\n";
-    auto visitor = [&](auto const& v) { os << v; };
+void print_edges(ostream& os, rva::variant<T...> const& expr) {
+    auto visitor = [&](auto const& v) { print_edges(os, v); };
     rva::visit(visitor, expr);
-    return os;
 }
 
-
+void print_graph(ostream& os, command const& ast) {
+    os << "digraph g { \n";
+    declare_nodes(os, ast);
+    print_edges(os, ast);
+    os << "}";
+}
 // ast_to_dotfile
 void ast_to_dotfile(string fname, command const& ast) {
-    std::ofstream dotfile;
-    int new_node = 0;
-    dotfile.open(fname);
-    dotfile << "digraph g { \n";
-    declare_nodes(dotfile, ast);
-    dotfile << ast;
-    dotfile << "}";
-    dotfile.close();
-}
+    std::ofstream dotfile(fname);
 
+    // Print the graph to the dotfile
+    print_graph(dotfile, ast);
+
+    // dotfile closed automatically when it falls out of scope
+}
 } // namespace imp
