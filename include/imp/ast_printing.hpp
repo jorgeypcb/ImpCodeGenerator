@@ -15,7 +15,7 @@ struct node_id {
     size_t type_size;
     size_t node_location;
     template <class T>
-    node_id(T const& node) noexcept
+    constexpr node_id(T const& node) noexcept
       : type_size(sizeof(T))
       , node_location((size_t)&node) {}
 };
@@ -27,7 +27,7 @@ ostream& operator<<(ostream& os, node_id n) {
     auto result = fmt::format_to_n(
         buffer,
         sizeof(buffer),
-        "s{:02x}x{:12x}",
+        "s{:02x}x{:012x}",
         n.type_size,
         n.node_location);
     return os << std::string_view(buffer, result.size);
@@ -45,33 +45,65 @@ node_id get_id(const rva::variant<T...>& anything) {
     auto visitor = [](auto const& x) { return get_id(x); };
     return rva::visit(visitor, anything);
 }
+} // namespace imp
+
+template<>
+struct fmt::formatter<imp::node_id> {
+    char open_char = '(';
+    char separator = ',';
+    char close_char = ')';
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    constexpr auto format(imp::node_id n, FormatContext& ctx) {
+        return fmt::format_to(
+            ctx.out(),
+            "s{:02x}x{:012x}",
+            n.type_size,
+            n.node_location);
+    }
+};
+namespace imp {
 
 // By default, there is no styling
-std::string_view style_node(auto const& node) {
-    return "";
+std::string_view style_node(std::vector<command> const&) {
+    return R"(label="[list of commands]")";
 }
 template <class Expr>
 std::string_view style_node(assignment<Expr> const&) {
-    return R"(fontname="Hack italic, monospace italic"; )";
+    return R"(fontname="Hack italic, monospace italic"; label="assignment")";
 }
-std::string_view style_node(bool_const const&) {
-    return R"(fontcolor="#9ECE6A"; )";
+auto style_node(bool_const const& node) {
+    return fmt::format(R"(fontcolor="#9ECE6A"; label="{}")", node.value);
 }
-std::string_view style_node(constant const&) {
-    return R"(fontcolor="#9ECE6A"; )";
+auto style_node(constant const& node) {
+    return fmt::format(R"(fontcolor="#9ECE6A"; label="{}")", node.value);
 }
 std::string_view style_node(while_loop<bool_expr, command> const&) {
-    return R"(fontcolor="#BB9AF7"; )";
+    return R"(fontcolor="#BB9AF7"; label="while loop")";
 }
 std::string_view style_node(if_command<bool_expr, command> const&) {
-    return R"(fontcolor="#BB9AF7"; )";
+    return R"(fontcolor="#BB9AF7"; label="conditional")";
 }
-std::string_view style_node(variable const&) {
-    return R"(fontcolor="#7AA2F7"; )";
+std::string_view style_node(skip_command const&) {
+    return R"(fontcolor="#BB9AF7"; label="skip")";
+}
+auto style_node(variable const& node) {
+    return fmt::format(R"(fontcolor="#7AA2F7"; label="{}")", node.get_name());
 }
 template <class Expr>
-std::string_view style_node(binary_expr<Expr> const&) {
-    return R"(fontname="Hack bold, monospace bold"; )";
+auto style_node(unary_expr<Expr> const& node) {
+    return fmt::format(
+        R"(fontname="Hack bold, monospace bold"; label="{}")",
+        node.get_op());
+}
+template <class Expr>
+auto style_node(binary_expr<Expr> const& node) {
+    return fmt::format(
+        R"(fontname="Hack bold, monospace bold"; label="{}")",
+        node.get_op());
 }
 
 // Forward declaration of declare_nodes and print_edges
@@ -82,35 +114,29 @@ void print_edges(ostream& os, rva::variant<T...> const& expr);
 
 // declare_node implementations
 void declare_nodes(ostream& os, constant const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.value << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
 }
 void declare_nodes(ostream& os, variable const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_name() << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
 }
 void declare_nodes(ostream& os, assignment<arith_expr> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"assignment\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.dest);
     declare_nodes(os, node.value);
 }
 
 void declare_nodes(ostream& os, binary_expr<arith_expr> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.get_left());
     declare_nodes(os, node.get_right());
 }
 
 void declare_nodes(ostream& os, bool_const const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.value << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
 }
 
 void declare_nodes(ostream& os, unary_expr<bool_expr> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.get_input());
 }
 
@@ -121,8 +147,7 @@ void print_edges(ostream& os, unary_expr<bool_expr> const& a) {
 }
 
 void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.get_left());
     declare_nodes(os, node.get_right());
 }
@@ -137,10 +162,7 @@ void print_edges(ostream& os, binary_expr<bool_expr> const& a) {
 }
 
 void declare_nodes(ostream& os, const imp::skip_command& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \""
-       << "skip"
-       << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
 }
 
 // These types have no children, and so print_edges does nothing
@@ -150,10 +172,7 @@ void print_edges(ostream& os, variable const& a) {}
 void print_edges(ostream& os, constant const& a) {}
 
 void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \""
-       << "if_condition"
-       << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.get_condition());
     declare_nodes(os, node.when_false());
     declare_nodes(os, node.when_true());
@@ -172,10 +191,7 @@ void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
 }
 
 void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
-    os << "    "; // Print space before line
-    os << get_id(node) << " [" << style_node(node) << "label = \""
-       << "while loop"
-       << "\"];\n";
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     declare_nodes(os, node.get_condition());
     declare_nodes(os, node.get_body());
 }
@@ -189,10 +205,9 @@ void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
     print_edges(os, a.get_body());
 }
 
-void declare_nodes(ostream& os, std::vector<command> const& victor) {
-    os << "    "; // Print space before line
-    os << get_id(victor) << " [" << style_node(victor) << "label = \"[list of commands]\"];\n";
-    for (auto& item : victor) {
+void declare_nodes(ostream& os, std::vector<command> const& node) {
+    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
+    for (auto& item : node) {
         declare_nodes(os, item);
     }
 }
