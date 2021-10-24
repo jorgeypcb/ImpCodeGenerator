@@ -54,13 +54,16 @@ auto style_node(rva::variant<T...> const& node) {
 }
 
 void declare_nodes(ostream& os, auto const& node) {
+    // Declare this node
     os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
+    // Declare the child nodes
     for_each(node, [&](auto const& child) {
         declare_nodes(os, child);
     });
 }
 
 void print_edges(ostream& os, auto const& node) {
+    // For each child, print an edge from this node to the child
     for_each(node, [&](auto const& child) {
         os <<  fmt::format("    {} -> {};\n", get_id(node), get_id(child));
         print_edges(os, child);
