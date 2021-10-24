@@ -6,7 +6,7 @@
 
 using namespace imp;
 
-int main() {
+int main(int argc, char const* argv[]) {
 
     // command test_command = assignment<arith_expr> { variable{"x"},
     // constant{10} };
@@ -67,5 +67,12 @@ int main() {
     };
 
 
-    ast_to_dotfile("testdot.dot", test_command);
+    // If no file is specified, print to standard output
+    if (argc == 1) {
+        print_graph(std::cout, test_command);
+    } else {
+        ast_to_dotfile(
+            argv[1], // The filename is stored in argument 1
+            test_command);
+    }
 }
