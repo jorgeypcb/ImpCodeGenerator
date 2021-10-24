@@ -146,7 +146,7 @@ void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
 void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
     os << "    "; // Print space before line
     os << get_id(node) << " [label = \""
-       << "while_condition"
+       << "while loop"
        << "\"];\n";
     declare_nodes(os, node.get_condition());
     declare_nodes(os, node.get_body());
@@ -163,7 +163,7 @@ void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
 
 void declare_nodes(ostream& os, std::vector<command> const& victor) {
     os << "    "; // Print space before line
-    os << get_id(victor) << " [label = \"list of commands\"];\n";
+    os << get_id(victor) << " [label = \"[list of commands]\"];\n";
     for (auto& item : victor) {
         declare_nodes(os, item);
     }
@@ -207,7 +207,21 @@ void print_edges(ostream& os, rva::variant<T...> const& expr) {
 }
 
 void print_graph(ostream& os, command const& ast) {
-    os << "digraph g { \n";
+    os << R"(digraph {
+    graph [
+        bgcolor="#24283B"
+        pad="0.5"
+        dpi=300]
+    node [
+        fontsize=12
+        fontcolor="#ffffff"
+        color="#E0AF68"
+        shape=underline
+        fontname="Hack, Fira Code, monospace"]
+    edge [
+        color="#BB9AF7"
+        arrowsize=0.5]
+)";
     declare_nodes(os, ast);
     print_edges(os, ast);
     os << "}\n";
