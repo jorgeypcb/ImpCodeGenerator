@@ -15,7 +15,8 @@ system.
 
 ## Example
 
-Output of running `build/example`, which prints the syntax tree:
+Output of running `build/ast_printing_test`, which prints the syntax tree when
+piped to graphviz:
 
 ![](docs/ast-example-output.png)
 
@@ -23,10 +24,9 @@ Corresponding syntax tree:
 
 ![](docs/ast-example.png)
 
-
 ## Summary of project
 
-*Taken from design document*
+_Taken from design document_
 
 > Translating programs in a very simple canonical imperative language, known in
 > the literature as WHILE, or sometimes IMP, into RISC-V assembly code. The
@@ -35,8 +35,8 @@ Corresponding syntax tree:
 > (risc-machine.cs.unm.edu) or a RISC-V emulator.
 >
 > - Task 1: Scan and parse a source language program to yield an abstract syntax
->   tree (AST). You can use whatever tools are appropriate to your implementation
->   language.
+>   tree (AST). You can use whatever tools are appropriate to your
+>   implementation language.
 > - Task 2: Display the AST. For the purposes of the project report, generate a
 >   PDF of the AST. (Hint: you can use an external graph-drawing tool, such as
 >   graphviz, to render an AST.)
