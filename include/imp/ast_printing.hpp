@@ -52,7 +52,7 @@ std::string_view style_node(auto const& node) {
 }
 template <class Expr>
 std::string_view style_node(assignment<Expr> const&) {
-    return R"(fontname="Hack italic, Fira Code italic, monospace italic"; )";
+    return R"(fontname="Hack italic, monospace italic"; )";
 }
 std::string_view style_node(bool_const const&) {
     return R"(fontcolor="#9ECE6A"; )";
@@ -71,7 +71,7 @@ std::string_view style_node(variable const&) {
 }
 template <class Expr>
 std::string_view style_node(binary_expr<Expr> const&) {
-    return R"(fontname="Hack bold, Fira Code bold, monospace bold"; )";
+    return R"(fontname="Hack bold, monospace bold"; )";
 }
 
 // Forward declaration of declare_nodes and print_edges
@@ -245,7 +245,7 @@ void print_graph(ostream& os, command const& ast) {
         fontcolor="#ffffff"
         color="#E0AF68"
         shape=underline
-        fontname="Hack, Fira Code, monospace"]
+        fontname="Hack, monospace"]
     edge [
         color="#E0AF68"
         arrowsize=0.5]
