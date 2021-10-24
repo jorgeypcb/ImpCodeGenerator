@@ -10,17 +10,24 @@
 namespace imp {
 struct constant {
     long long value;
+
+    constexpr void for_each(auto&& func) const noexcept {}
 };
 struct bool_const {
     bool value;
+
+    constexpr void for_each(auto&& func) const noexcept {}
 };
 struct variable {
     std::string_view name;
-    std::string_view get_name() const {
-        return name;
-    }
+    std::string_view get_name() const { return name; }
+
+    constexpr void for_each(auto&& func) const noexcept {}
 };
-struct comment : std::string_view {};
+struct comment : std::string_view {
+
+    constexpr void for_each(auto&& func) const noexcept {}
+};
 
 template <class T>
 struct unary_expr {
@@ -29,12 +36,10 @@ struct unary_expr {
         char op;
     };
     copyable_ptr<expr_data> data_ptr;
-    T const& get_input() const {
-        return data_ptr->value;
-    }
-    char get_op() const {
-        return data_ptr->op;
-    }
+    T const& get_input() const { return data_ptr->value; }
+    char get_op() const { return data_ptr->op; }
+
+    constexpr void for_each(auto&& func) const noexcept { func(get_input()); }
 };
 template <class T>
 struct binary_expr {
@@ -45,17 +50,18 @@ struct binary_expr {
     };
     copyable_ptr<data> data_ptr;
 
-    T const& get_left() const {
-        return data_ptr->left;
-    }
-    T const& get_right() const {
-        return data_ptr->right;
-    }
-    char get_op() const {
-        return data_ptr->op;
+    T const& get_left() const { return data_ptr->left; }
+    T const& get_right() const { return data_ptr->right; }
+    char get_op() const { return data_ptr->op; }
+
+    constexpr void for_each(auto&& func) const noexcept {
+        func(get_left());
+        func(get_right());
     }
 };
-struct skip_command {};
+struct skip_command {
+    constexpr void for_each(auto&& func) const noexcept {}
+};
 
 template <class BExpr, class Cmd>
 struct if_command {
@@ -65,14 +71,14 @@ struct if_command {
         Cmd when_false;
     };
     copyable_ptr<data> data_ptr;
-    BExpr const& get_condition() const {
-        return data_ptr->condition;
-    }
-    Cmd const& when_true() const {
-        return data_ptr->when_true;
-    }
-    Cmd const& when_false() const {
-        return data_ptr->when_false;
+    BExpr const& get_condition() const { return data_ptr->condition; }
+    Cmd const& when_true() const { return data_ptr->when_true; }
+    Cmd const& when_false() const { return data_ptr->when_false; }
+
+    constexpr void for_each(auto&& func) const noexcept {
+        func(get_condition());
+        func(when_true());
+        func(when_false());
     }
 };
 template <class BExpr, class Cmd>
@@ -82,18 +88,42 @@ struct while_loop {
         Cmd body;
     };
     copyable_ptr<data> data_ptr;
-    BExpr const& get_condition() const {
-        return data_ptr->condition;
-    }
-    Cmd const& get_body() const {
-        return data_ptr->body;
+    BExpr const& get_condition() const { return data_ptr->condition; }
+    Cmd const& get_body() const { return data_ptr->body; }
+
+    constexpr void for_each(auto&& func) const noexcept {
+        func(get_condition());
+        func(get_body());
     }
 };
 template <class Expr>
 struct assignment {
     variable dest;
     Expr value;
+
+    constexpr void for_each(auto&& func) const noexcept {
+        func(dest);
+        func(value);
+    }
 };
+
+template <class T, class F>
+void for_each(T const& item, F && func) {
+    item.for_each(func);
+}
+
+template <class T, class F>
+void for_each(std::vector<T> const& vect, F&& func) {
+    for(auto& item : vect) {
+        func(item);
+    }
+}
+
+template <class... T, class F>
+void for_each(rva::variant<T...> const& v, F&& func) {
+    rva::visit([&](auto const& node) { for_each(node, func); }, v);
+}
+
 
 
 // clang-format off
