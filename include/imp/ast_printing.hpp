@@ -20,19 +20,6 @@ struct node_id {
       , node_location((size_t)&node) {}
 };
 
-ostream& operator<<(ostream& os, node_id n) {
-    // The worst case size is 34 bytes,
-    // however the actual size will probably be 16 bytes
-    char buffer[40];
-    auto result = fmt::format_to_n(
-        buffer,
-        sizeof(buffer),
-        "s{:02x}x{:012x}",
-        n.type_size,
-        n.node_location);
-    return os << std::string_view(buffer, result.size);
-}
-
 template <class T>
 node_id get_id(const T& anything) {
     // This creates a unique identifier by combining the location of the
@@ -47,11 +34,8 @@ node_id get_id(const rva::variant<T...>& anything) {
 }
 } // namespace imp
 
-template<>
+template <>
 struct fmt::formatter<imp::node_id> {
-    char open_char = '(';
-    char separator = ',';
-    char close_char = ')';
     constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
         return ctx.begin();
     }
@@ -60,7 +44,7 @@ struct fmt::formatter<imp::node_id> {
     constexpr auto format(imp::node_id n, FormatContext& ctx) {
         return fmt::format_to(
             ctx.out(),
-            "s{:02x}x{:012x}",
+            "s{:02x}x{:x}",
             n.type_size,
             n.node_location);
     }
@@ -141,8 +125,7 @@ void declare_nodes(ostream& os, unary_expr<bool_expr> const& node) {
 }
 
 void print_edges(ostream& os, unary_expr<bool_expr> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_input()) << "\n";
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_input()));
     print_edges(os, a.get_input());
 }
 
@@ -153,10 +136,8 @@ void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
 }
 
 void print_edges(ostream& os, binary_expr<bool_expr> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_left()) << "\n";
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_right()) << "\n";
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_left()));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_right()));
     print_edges(os, a.get_left());
     print_edges(os, a.get_right());
 }
@@ -179,12 +160,9 @@ void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
 }
 
 void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_condition()) << "\n";
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.when_false()) << "\n";
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.when_true()) << "\n";
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_condition()));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.when_false()));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.when_true()));
     print_edges(os, a.get_condition());
     print_edges(os, a.when_false());
     print_edges(os, a.when_true());
@@ -197,10 +175,8 @@ void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
 }
 
 void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_condition()) << "\n";
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_body()) << "\n";
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_condition()));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_body()));
     print_edges(os, a.get_condition());
     print_edges(os, a.get_body());
 }
@@ -219,26 +195,21 @@ void declare_nodes(ostream& os, rva::variant<T...> const& node) {
 }
 
 void print_edges(ostream& os, binary_expr<arith_expr> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_left()) << '\n';
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.get_right()) << '\n';
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_left()));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_right()));
     print_edges(os, a.get_left());
     print_edges(os, a.get_right());
 }
 
 void print_edges(ostream& os, assignment<arith_expr> const& a) {
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.dest) << '\n';
-    os << "    "; // Print space before line
-    os << get_id(a) << " -> " << get_id(a.value) << '\n';
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.dest));
+    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.value));
     print_edges(os, a.value);
 }
 
 void print_edges(ostream& os, std::vector<command> const& victor) {
     for (auto& item : victor) {
-        os << "    "; // Print space before line
-        os << get_id(victor) << " -> " << get_id(item) << "\n";
+        os << fmt::format("    {} -> {};\n", get_id(victor), get_id(item));
         print_edges(os, item);
     }
 }
