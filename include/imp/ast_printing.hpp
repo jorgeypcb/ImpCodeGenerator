@@ -89,135 +89,23 @@ auto style_node(binary_expr<Expr> const& node) {
         R"(fontname="Hack bold, monospace bold"; label="{}")",
         node.get_op());
 }
-
-// Forward declaration of declare_nodes and print_edges
 template <class... T>
-void declare_nodes(ostream& os, rva::variant<T...> const& node);
-template <class... T>
-void print_edges(ostream& os, rva::variant<T...> const& expr);
+auto style_node(rva::variant<T...> const& node) {
+    return rva::visit([](auto const& item) { return style_node(item); }, node);
+}
 
-// declare_node implementations
-void declare_nodes(ostream& os, constant const& node) {
+void declare_nodes(ostream& os, auto const& node) {
     os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-}
-void declare_nodes(ostream& os, variable const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-}
-void declare_nodes(ostream& os, assignment<arith_expr> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.dest);
-    declare_nodes(os, node.value);
+    for_each(node, [&](auto const& child) {
+        declare_nodes(os, child);
+    });
 }
 
-void declare_nodes(ostream& os, binary_expr<arith_expr> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.get_left());
-    declare_nodes(os, node.get_right());
-}
-
-void declare_nodes(ostream& os, bool_const const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-}
-
-void declare_nodes(ostream& os, unary_expr<bool_expr> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.get_input());
-}
-
-void print_edges(ostream& os, unary_expr<bool_expr> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_input()));
-    print_edges(os, a.get_input());
-}
-
-void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.get_left());
-    declare_nodes(os, node.get_right());
-}
-
-void print_edges(ostream& os, binary_expr<bool_expr> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_left()));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_right()));
-    print_edges(os, a.get_left());
-    print_edges(os, a.get_right());
-}
-
-void declare_nodes(ostream& os, const imp::skip_command& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-}
-
-// These types have no children, and so print_edges does nothing
-void print_edges(ostream& os, bool_const const& a) {}
-void print_edges(ostream& os, skip_command const& a) {}
-void print_edges(ostream& os, variable const& a) {}
-void print_edges(ostream& os, constant const& a) {}
-
-void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.get_condition());
-    declare_nodes(os, node.when_false());
-    declare_nodes(os, node.when_true());
-}
-
-void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_condition()));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.when_false()));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.when_true()));
-    print_edges(os, a.get_condition());
-    print_edges(os, a.when_false());
-    print_edges(os, a.when_true());
-}
-
-void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    declare_nodes(os, node.get_condition());
-    declare_nodes(os, node.get_body());
-}
-
-void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_condition()));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_body()));
-    print_edges(os, a.get_condition());
-    print_edges(os, a.get_body());
-}
-
-void declare_nodes(ostream& os, std::vector<command> const& node) {
-    os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
-    for (auto& item : node) {
-        declare_nodes(os, item);
-    }
-}
-
-template <class... T>
-void declare_nodes(ostream& os, rva::variant<T...> const& node) {
-    auto visitor = [&](auto const& v) { declare_nodes(os, v); };
-    rva::visit(visitor, node);
-}
-
-void print_edges(ostream& os, binary_expr<arith_expr> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_left()));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.get_right()));
-    print_edges(os, a.get_left());
-    print_edges(os, a.get_right());
-}
-
-void print_edges(ostream& os, assignment<arith_expr> const& a) {
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.dest));
-    os << fmt::format("    {} -> {};\n", get_id(a), get_id(a.value));
-    print_edges(os, a.value);
-}
-
-void print_edges(ostream& os, std::vector<command> const& victor) {
-    for (auto& item : victor) {
-        os << fmt::format("    {} -> {};\n", get_id(victor), get_id(item));
-        print_edges(os, item);
-    }
-}
-
-template <class... T>
-void print_edges(ostream& os, rva::variant<T...> const& expr) {
-    auto visitor = [&](auto const& v) { print_edges(os, v); };
-    rva::visit(visitor, expr);
+void print_edges(ostream& os, auto const& node) {
+    for_each(node, [&](auto const& child) {
+        os <<  fmt::format("    {} -> {};\n", get_id(node), get_id(child));
+        print_edges(os, child);
+    });
 }
 
 void print_graph(ostream& os, command const& ast) {
