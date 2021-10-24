@@ -46,6 +46,34 @@ node_id get_id(const rva::variant<T...>& anything) {
     return rva::visit(visitor, anything);
 }
 
+// By fedault, there is no styling
+std::string_view style_node(auto const& node) {
+    return "";
+}
+template <class Expr>
+std::string_view style_node(assignment<Expr> const&) {
+    return R"(fontname="Hack italic, Fira Code italic, monospace italic"; )";
+}
+std::string_view style_node(bool_const const&) {
+    return R"(fontcolor="#9ECE6A"; )";
+}
+std::string_view style_node(constant const&) {
+    return R"(fontcolor="#9ECE6A"; )";
+}
+std::string_view style_node(while_loop<bool_expr, command> const&) {
+    return R"(fontcolor="#BB9AF7"; )";
+}
+std::string_view style_node(if_command<bool_expr, command> const&) {
+    return R"(fontcolor="#BB9AF7"; )";
+}
+std::string_view style_node(variable const&) {
+    return R"(fontcolor="#7AA2F7"; )";
+}
+template <class Expr>
+std::string_view style_node(binary_expr<Expr> const&) {
+    return R"(fontname="Hack bold, Fira Code bold, monospace bold"; )";
+}
+
 // Forward declaration of declare_nodes and print_edges
 template <class... T>
 void declare_nodes(ostream& os, rva::variant<T...> const& node);
@@ -55,34 +83,34 @@ void print_edges(ostream& os, rva::variant<T...> const& expr);
 // declare_node implementations
 void declare_nodes(ostream& os, constant const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.value << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.value << "\"];\n";
 }
 void declare_nodes(ostream& os, variable const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.get_name() << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_name() << "\"];\n";
 }
 void declare_nodes(ostream& os, assignment<arith_expr> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"assignment\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"assignment\"];\n";
     declare_nodes(os, node.dest);
     declare_nodes(os, node.value);
 }
 
 void declare_nodes(ostream& os, binary_expr<arith_expr> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.get_op() << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
     declare_nodes(os, node.get_left());
     declare_nodes(os, node.get_right());
 }
 
 void declare_nodes(ostream& os, bool_const const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.value << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.value << "\"];\n";
 }
 
 void declare_nodes(ostream& os, unary_expr<bool_expr> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.get_op() << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
     declare_nodes(os, node.get_input());
 }
 
@@ -94,7 +122,7 @@ void print_edges(ostream& os, unary_expr<bool_expr> const& a) {
 
 void declare_nodes(ostream& os, binary_expr<bool_expr> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \"" << node.get_op() << "\"];\n";
+    os << get_id(node) << " [" << style_node(node) << "label = \"" << node.get_op() << "\"];\n";
     declare_nodes(os, node.get_left());
     declare_nodes(os, node.get_right());
 }
@@ -110,7 +138,7 @@ void print_edges(ostream& os, binary_expr<bool_expr> const& a) {
 
 void declare_nodes(ostream& os, const imp::skip_command& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \""
+    os << get_id(node) << " [" << style_node(node) << "label = \""
        << "skip"
        << "\"];\n";
 }
@@ -123,7 +151,7 @@ void print_edges(ostream& os, constant const& a) {}
 
 void declare_nodes(ostream& os, if_command<bool_expr, command> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \""
+    os << get_id(node) << " [" << style_node(node) << "label = \""
        << "if_condition"
        << "\"];\n";
     declare_nodes(os, node.get_condition());
@@ -145,7 +173,7 @@ void print_edges(ostream& os, if_command<bool_expr, command> const& a) {
 
 void declare_nodes(ostream& os, while_loop<bool_expr, command> const& node) {
     os << "    "; // Print space before line
-    os << get_id(node) << " [label = \""
+    os << get_id(node) << " [" << style_node(node) << "label = \""
        << "while loop"
        << "\"];\n";
     declare_nodes(os, node.get_condition());
@@ -163,7 +191,7 @@ void print_edges(ostream& os, while_loop<bool_expr, command> const& a) {
 
 void declare_nodes(ostream& os, std::vector<command> const& victor) {
     os << "    "; // Print space before line
-    os << get_id(victor) << " [label = \"[list of commands]\"];\n";
+    os << get_id(victor) << " [" << style_node(victor) << "label = \"[list of commands]\"];\n";
     for (auto& item : victor) {
         declare_nodes(os, item);
     }
@@ -219,7 +247,7 @@ void print_graph(ostream& os, command const& ast) {
         shape=underline
         fontname="Hack, Fira Code, monospace"]
     edge [
-        color="#BB9AF7"
+        color="#E0AF68"
         arrowsize=0.5]
 )";
     declare_nodes(os, ast);
