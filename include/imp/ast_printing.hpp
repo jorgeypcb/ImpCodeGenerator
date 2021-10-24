@@ -46,7 +46,7 @@ node_id get_id(const rva::variant<T...>& anything) {
     return rva::visit(visitor, anything);
 }
 
-// By fedault, there is no styling
+// By default, there is no styling
 std::string_view style_node(auto const& node) {
     return "";
 }
