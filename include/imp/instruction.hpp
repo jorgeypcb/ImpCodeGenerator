@@ -41,7 +41,26 @@ struct instruction {
     int output;
 
     OpCategory getCategory() const {
-
+        switch(op) {
+            case Op::Plus:
+            case Op::Minus:
+            case Op::Times:
+            case Op::Greater:
+            case Op::GreaterEq:
+            case Op::Equal:
+            case Op::Or:
+            case Op::And:
+                return OpCategory::BinaryOp;
+            case Op::Not:
+                return OpCategory::UnaryOp;
+            case Op::LoadConstant:
+                return OpCategory::LoadConstantOp;
+            case Op::JumpIfZero:
+            case Op::JumpIfNonzero:
+                return OpCategory::JumpOp;
+            case Op::Label:
+                return OpCategory::LabelOp;
+        }
     }
 };
 } // namespace imp
