@@ -22,4 +22,11 @@ enum class Op {
     // 1 Label
     Label
 };
-}
+
+struct instruction {
+    Op op {};  // Stores the operand
+    int i1 {}; // Used for input1 and the condition of a jump
+    int i2 {}; // Used for input2 and the label
+    int output;
+};
+} // namespace imp
