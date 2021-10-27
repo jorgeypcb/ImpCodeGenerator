@@ -2,7 +2,7 @@
 
 namespace imp {
 enum class Op {
-    // 2 inputs, 1 Output
+    // Binrary op: 2 inputs, 1 Output
     Plus,
     Minus,
     Times,
@@ -12,15 +12,26 @@ enum class Op {
     Or,
     And,
 
-    // 1 Input, 1 Output
+    // Unary op: 1 Input, 1 Output
     Not,
+
+    // LoadConstantOp: 1 constant, 1 output
     LoadConstant,
 
-    // 1 Input, 1 Label, No Output
+    // JumpOp 1 Input, 1 Label, No Output
     JumpIfZero,
     JumpIfNonzero,
-    // 1 Label
+
+    // LabelOp: 1 Label
     Label
+};
+
+enum class OpCategory {
+    BinaryOp,
+    UnaryOp,
+    LoadConstantOp,
+    JumpOp,
+    LabelOp
 };
 
 struct instruction {
@@ -28,5 +39,9 @@ struct instruction {
     int i1 {}; // Used for input1 and the condition of a jump
     int i2 {}; // Used for input2 and the label
     int output;
+
+    OpCategory getCategory() const {
+
+    }
 };
 } // namespace imp
