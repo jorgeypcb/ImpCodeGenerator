@@ -28,7 +28,14 @@ enum class Op {
     Label
 };
 
-enum class OpCategory { BinaryOp, UnaryOp, LoadConstantOp, JumpOp, LabelOp };
+enum class OpCategory {
+    BinaryOp,
+    UnaryOp,
+    LoadConstantOp,
+    JumpOp,
+    LabelOp,
+    Unknown
+};
 
 struct instruction {
     Op op {};  // Stores the operand
@@ -36,7 +43,7 @@ struct instruction {
     int i2 {}; // Used for input2 and the label
     int output;
 
-    OpCategory getCategory() const {
+    constexpr OpCategory getCategory() const noexcept {
         switch (op) {
             case Op::Plus:
             case Op::Minus:
@@ -52,6 +59,7 @@ struct instruction {
             case Op::JumpIfNonzero: return OpCategory::JumpOp;
             case Op::Label: return OpCategory::LabelOp;
         }
+        return OpCategory::Unknown;
     }
 };
 #define ENUM_TO_STR_CASE(EnumName, EnumValue)                                  \
@@ -73,6 +81,7 @@ constexpr static std::string_view to_string(Op o) {
         ENUM_TO_STR_CASE(Op, JumpIfNonzero);
         ENUM_TO_STR_CASE(Op, Label);
     }
+    return "<unknown category>";
 }
 } // namespace imp
 
@@ -119,6 +128,14 @@ struct fmt::formatter<imp::instruction> {
                     out);
             case Op::Label:
                 return fmt::format_to(ctx.out(), "{} .LBB_{}", op_name, i1);
+            default:
+                return fmt::format_to(
+                    ctx.out(),
+                    "Op({}) {} {} {}",
+                    (int)op,
+                    i1,
+                    i2,
+                    out);
         }
     }
 };
