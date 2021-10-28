@@ -1,4 +1,6 @@
 #pragma once
+#include <fmt/format.h>
+#include <string_view>
 
 namespace imp {
 enum class Op {
@@ -26,13 +28,7 @@ enum class Op {
     Label
 };
 
-enum class OpCategory {
-    BinaryOp,
-    UnaryOp,
-    LoadConstantOp,
-    JumpOp,
-    LabelOp
-};
+enum class OpCategory { BinaryOp, UnaryOp, LoadConstantOp, JumpOp, LabelOp };
 
 struct instruction {
     Op op {};  // Stores the operand
@@ -41,7 +37,7 @@ struct instruction {
     int output;
 
     OpCategory getCategory() const {
-        switch(op) {
+        switch (op) {
             case Op::Plus:
             case Op::Minus:
             case Op::Times:
@@ -49,18 +45,33 @@ struct instruction {
             case Op::GreaterEq:
             case Op::Equal:
             case Op::Or:
-            case Op::And:
-                return OpCategory::BinaryOp;
-            case Op::Not:
-                return OpCategory::UnaryOp;
-            case Op::LoadConstant:
-                return OpCategory::LoadConstantOp;
+            case Op::And: return OpCategory::BinaryOp;
+            case Op::Not: return OpCategory::UnaryOp;
+            case Op::LoadConstant: return OpCategory::LoadConstantOp;
             case Op::JumpIfZero:
-            case Op::JumpIfNonzero:
-                return OpCategory::JumpOp;
-            case Op::Label:
-                return OpCategory::LabelOp;
+            case Op::JumpIfNonzero: return OpCategory::JumpOp;
+            case Op::Label: return OpCategory::LabelOp;
         }
     }
 };
+#define ENUM_TO_STR_CASE(EnumName, EnumValue)                                  \
+    case EnumName::EnumValue: return #EnumValue;
+
+constexpr static std::string_view to_string(Op o) {
+    switch (o) {
+        ENUM_TO_STR_CASE(Op, Plus);
+        ENUM_TO_STR_CASE(Op, Minus);
+        ENUM_TO_STR_CASE(Op, Times);
+        ENUM_TO_STR_CASE(Op, Greater);
+        ENUM_TO_STR_CASE(Op, GreaterEq);
+        ENUM_TO_STR_CASE(Op, Equal);
+        ENUM_TO_STR_CASE(Op, Or);
+        ENUM_TO_STR_CASE(Op, And);
+        ENUM_TO_STR_CASE(Op, Not);
+        ENUM_TO_STR_CASE(Op, LoadConstant);
+        ENUM_TO_STR_CASE(Op, JumpIfZero);
+        ENUM_TO_STR_CASE(Op, JumpIfNonzero);
+        ENUM_TO_STR_CASE(Op, Label);
+    }
+}
 } // namespace imp
