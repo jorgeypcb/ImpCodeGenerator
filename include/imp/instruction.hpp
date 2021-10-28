@@ -75,3 +75,50 @@ constexpr static std::string_view to_string(Op o) {
     }
 }
 } // namespace imp
+
+
+template <>
+struct fmt::formatter<imp::instruction> {
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.begin();
+    }
+
+    template <class Context>
+    constexpr auto format(imp::instruction const& ins, Context& ctx)
+        -> decltype(ctx.out()) {
+        using imp::Op;
+        auto [op, i1, i2, out] = ins;
+        auto op_name = imp::to_string(op);
+        switch (op) {
+            case Op::Plus:
+            case Op::Minus:
+            case Op::Times:
+            case Op::Greater:
+            case Op::GreaterEq:
+            case Op::Equal:
+            case Op::Or:
+            case Op::And:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} {} {}",
+                    op_name,
+                    i1,
+                    i2,
+                    out);
+            case Op::Not:
+                return fmt::format_to(ctx.out(), "{} {} {}", op_name, i1, out);
+            case Op::LoadConstant:
+                return fmt::format_to(ctx.out(), "{} {} {}", op_name, i1, out);
+            case Op::JumpIfZero:
+            case Op::JumpIfNonzero:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} .LBB_{}",
+                    op_name,
+                    i1,
+                    out);
+            case Op::Label:
+                return fmt::format_to(ctx.out(), "{} .LBB_{}", op_name, i1);
+        }
+    }
+};
