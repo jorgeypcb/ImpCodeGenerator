@@ -100,7 +100,64 @@ struct fmt::formatter<imp::instruction> {
     }
 
     template <class Context>
-    constexpr auto format(imp::instruction const& ins, Context& ctx)
+    constexpr auto format(imp::instruction const& ins, Context& ctx) {
+        return format_python(ins, ctx);
+    }
+
+    // Format requested by group
+    template <class Context>
+    constexpr auto format_python(imp::instruction const& ins, Context& ctx)
+        -> decltype(ctx.out()) {
+        using imp::Op;
+        auto [op, i1, i2, out] = ins;
+        auto op_name = imp::to_string(op);
+
+        // Operations in the same category get formatted in the same way
+        switch (op) {
+            case Op::Plus:
+            case Op::Minus:
+            case Op::Times:
+            case Op::Greater:
+            case Op::GreaterEq:
+            case Op::Equal:
+            case Op::Or:
+            case Op::And:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} {} {}",
+                    op_name,
+                    i1,
+                    i2,
+                    out);
+            case Op::Not:
+                return fmt::format_to(ctx.out(), "{} {} null {}", op_name, i1, out);
+            case Op::LoadConstant:
+                return fmt::format_to(ctx.out(), "{} {} null {}", op_name, i1, out);
+            case Op::JumpIfZero:
+            case Op::JumpIfNonzero:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} .LBB_{} null",
+                    op_name,
+                    i1,
+                    i2);
+            case Op::Label:
+                return fmt::format_to(ctx.out(), "{} .LBB_{} null null", op_name, i1);
+
+            // Used if given an unknown opcode
+            default:
+                return fmt::format_to(
+                    ctx.out(),
+                    "Op({}) {} {} {}",
+                    (int)op,
+                    i1,
+                    i2,
+                    out);
+        }
+    }
+
+    template <class Context>
+    constexpr auto format_alt(imp::instruction const& ins, Context& ctx)
         -> decltype(ctx.out()) {
         using imp::Op;
         auto [op, i1, i2, out] = ins;

@@ -6,8 +6,8 @@ GreaterEq 1 2 3
 Equal 1 2 3
 Or 1 2 3
 And 1 2 3
-Not 1 3
-LoadConstant 1 3
-JumpIfZero 1 .LBB_2
-JumpIfNonzero 1 .LBB_2
-Label .LBB_1
+Not 1 null 3
+LoadConstant 1 null 3
+JumpIfZero 1 .LBB_2 null
+JumpIfNonzero 1 .LBB_2 null
+Label .LBB_1 null null
