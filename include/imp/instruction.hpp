@@ -28,6 +28,7 @@ enum class Op {
     Label
 };
 
+// Defines the category of an operation (see above)
 enum class OpCategory {
     BinaryOp,
     UnaryOp,
@@ -43,6 +44,7 @@ struct instruction {
     int i2 {};  // Used for input2 and the location of a jump
     int output; // Used as the destination of an instruction
 
+    // Gets the category of an operation based on the operation
     constexpr OpCategory getCategory() const noexcept {
         switch (op) {
             case Op::Plus:
@@ -59,29 +61,33 @@ struct instruction {
             case Op::JumpIfNonzero: return OpCategory::JumpOp;
             case Op::Label: return OpCategory::LabelOp;
         }
+
+        // Used if given an unknown opcode
         return OpCategory::Unknown;
     }
 };
-#define ENUM_TO_STR_CASE(EnumName, EnumValue)                                  \
+#define IMP_ENUM_TO_STR_CASE(EnumName, EnumValue)                                  \
     case EnumName::EnumValue: return #EnumValue;
 
 constexpr static std::string_view to_string(Op o) {
     switch (o) {
-        ENUM_TO_STR_CASE(Op, Plus);
-        ENUM_TO_STR_CASE(Op, Minus);
-        ENUM_TO_STR_CASE(Op, Times);
-        ENUM_TO_STR_CASE(Op, Greater);
-        ENUM_TO_STR_CASE(Op, GreaterEq);
-        ENUM_TO_STR_CASE(Op, Equal);
-        ENUM_TO_STR_CASE(Op, Or);
-        ENUM_TO_STR_CASE(Op, And);
-        ENUM_TO_STR_CASE(Op, Not);
-        ENUM_TO_STR_CASE(Op, LoadConstant);
-        ENUM_TO_STR_CASE(Op, JumpIfZero);
-        ENUM_TO_STR_CASE(Op, JumpIfNonzero);
-        ENUM_TO_STR_CASE(Op, Label);
+        IMP_ENUM_TO_STR_CASE(Op, Plus);
+        IMP_ENUM_TO_STR_CASE(Op, Minus);
+        IMP_ENUM_TO_STR_CASE(Op, Times);
+        IMP_ENUM_TO_STR_CASE(Op, Greater);
+        IMP_ENUM_TO_STR_CASE(Op, GreaterEq);
+        IMP_ENUM_TO_STR_CASE(Op, Equal);
+        IMP_ENUM_TO_STR_CASE(Op, Or);
+        IMP_ENUM_TO_STR_CASE(Op, And);
+        IMP_ENUM_TO_STR_CASE(Op, Not);
+        IMP_ENUM_TO_STR_CASE(Op, LoadConstant);
+        IMP_ENUM_TO_STR_CASE(Op, JumpIfZero);
+        IMP_ENUM_TO_STR_CASE(Op, JumpIfNonzero);
+        IMP_ENUM_TO_STR_CASE(Op, Label);
     }
-    return "<unknown category>";
+
+    // Used if given an unknown opcode
+    return "<unknown opcode>";
 }
 } // namespace imp
 
@@ -89,6 +95,7 @@ constexpr static std::string_view to_string(Op o) {
 template <>
 struct fmt::formatter<imp::instruction> {
     constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        // Doesn't parse formatting context for now, just use empty {}
         return ctx.begin();
     }
 
@@ -98,6 +105,8 @@ struct fmt::formatter<imp::instruction> {
         using imp::Op;
         auto [op, i1, i2, out] = ins;
         auto op_name = imp::to_string(op);
+
+        // Operations in the same category get formatted in the same way
         switch (op) {
             case Op::Plus:
             case Op::Minus:
@@ -128,6 +137,8 @@ struct fmt::formatter<imp::instruction> {
                     i2);
             case Op::Label:
                 return fmt::format_to(ctx.out(), "{} .LBB_{}", op_name, i1);
+
+            // Used if given an unknown opcode
             default:
                 return fmt::format_to(
                     ctx.out(),
