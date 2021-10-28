@@ -38,10 +38,10 @@ enum class OpCategory {
 };
 
 struct instruction {
-    Op op {};  // Stores the operand
-    int i1 {}; // Used for input1 and the condition of a jump
-    int i2 {}; // Used for input2 and the label
-    int output;
+    Op op {};   // Stores the operand
+    int i1 {};  // Used for input1 and the condition of a jump
+    int i2 {};  // Used for input2 and the location of a jump
+    int output; // Used as the destination of an instruction
 
     constexpr OpCategory getCategory() const noexcept {
         switch (op) {
@@ -125,7 +125,7 @@ struct fmt::formatter<imp::instruction> {
                     "{} {} .LBB_{}",
                     op_name,
                     i1,
-                    out);
+                    i2);
             case Op::Label:
                 return fmt::format_to(ctx.out(), "{} .LBB_{}", op_name, i1);
             default:
