@@ -70,7 +70,7 @@ def print_run_imp_actual(instructions):
         run_imp_actual+=print_riscv_instruction(i)
     return run_imp_actual
     
-with open(str(sys.arvg[1])), 'r') as f:
+with open(str(sys.arvg[1]), 'r') as f:
     operations = f.readlines()
     instructions = [o.split(' ') for o in operations]
 
