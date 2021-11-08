@@ -25,6 +25,7 @@ class copyable_ptr {
 
     constexpr auto& operator=(copyable_ptr other) noexcept {
         std::swap(pointer, other.pointer);
+        return *this;
     }
 
     constexpr T* operator->() noexcept { return pointer; }
