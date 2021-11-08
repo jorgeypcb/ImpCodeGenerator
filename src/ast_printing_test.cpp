@@ -32,38 +32,32 @@ int main(int argc, char const* argv[]) {
                 variable {"z"}, // <br>
                 arith_expr {
                     binary_expr<arith_expr> {
-                        binary_expr<arith_expr>::data {
-                            variable {"x"}, // <br>
-                            variable {"y"}, // <br>
-                            '+'             // <br>
-                        }                   // <br>
-                    }                       // <br>
-                }                           // <br>
-            },                              // <br>
+                        variable {"x"}, // <br>
+                        variable {"y"}, // <br>
+                        '+'             // <br>
+                    }                   // <br>
+                }                       // <br>
+            },                          // <br>
             while_loop<bool_expr, command> {
                 while_loop<bool_expr, command>::data {
                     binary_expr<arith_expr> {
-                        binary_expr<arith_expr>::data {
-                            variable {"x"}, // <br>
-                            variable {"y"}, // <br>
-                            '>'             // <br>
-                        }                   // <br>
-                    },                      // <br>
+                        variable {"x"}, // <br>
+                        variable {"y"}, // <br>
+                        '>'             // <br>
+                    },                  // <br>
                     assignment<arith_expr> {
                         variable {"x"}, // <br>
                         arith_expr {
                             binary_expr<arith_expr> {
-                                binary_expr<arith_expr>::data {
-                                    variable {"x"}, // <br>
-                                    constant {1},   // <br>
-                                    '+'             // <br>
-                                }                   // <br>
-                            }                       // <br>
-                        }                           // <br>
-                    }                               // <br>
-                }                                   // <br>
-            }                                       // <br>
-        }                                           // <br>
+                                variable {"x"}, // <br>
+                                constant {1},   // <br>
+                                '+'             // <br>
+                            }                   // <br>
+                        }                       // <br>
+                    }                           // <br>
+                }                               // <br>
+            }                                   // <br>
+        }                                       // <br>
     };
 
 

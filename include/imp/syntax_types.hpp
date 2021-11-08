@@ -46,13 +46,16 @@ struct binary_expr {
     struct data {
         T left;
         T right;
-        char op;
     };
     copyable_ptr<data> data_ptr;
+    char op;
+    binary_expr(T&& left, T&& right, char op)
+      : data_ptr(data {std::move(left), std::move(right)})
+      , op(op) {}
 
     T const& get_left() const { return data_ptr->left; }
     T const& get_right() const { return data_ptr->right; }
-    char get_op() const { return data_ptr->op; }
+    char get_op() const { return op; }
 
     constexpr void for_each(auto&& func) const noexcept {
         func(get_left());
@@ -108,13 +111,13 @@ struct assignment {
 };
 
 template <class T, class F>
-void for_each(T const& item, F && func) {
+void for_each(T const& item, F&& func) {
     item.for_each(func);
 }
 
 template <class T, class F>
 void for_each(std::vector<T> const& vect, F&& func) {
-    for(auto& item : vect) {
+    for (auto& item : vect) {
         func(item);
     }
 }
