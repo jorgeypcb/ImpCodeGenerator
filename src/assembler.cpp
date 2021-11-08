@@ -33,15 +33,12 @@ constexpr auto parse_op = noam::parser {
         if (st.empty()) {
             return {};
         }
-        fmt::print("Parsing '{}'\n", st);
         char ch = st[0];
-        fmt::print("ch: {}\n", ch);
         switch (ch) {
             case '+': return {st.substr(1), ch};
             case '-': return {st.substr(1), ch};
             case '*': return {st.substr(1), ch};
         }
-        fmt::print("{} wasn't an operator\n", ch);
         return {};
     }};
 constexpr auto parse_constant = noam::make<constant>(noam::parse_long_long);
@@ -69,47 +66,32 @@ constexpr auto parse_arith_expr = noam::recurse<arith_expr>(
     [](auto parse_arith_expr) {
         return noam::parser {[=](noam::state_t st) -> noam::result<arith_expr> {
             st = noam::whitespace.parse(st).get_state();
-            if (noam::result<arith_expr> value = parse_cons_or_var.parse(st)) {
-                st = value.get_state();
+            if (noam::result<arith_expr> left_expr = parse_cons_or_var.parse(st)) {
+                st = left_expr.get_state();
                 // Read all whitespace
                 st = noam::whitespace.parse(st).get_state();
-
-                fmt::print("Parsed value. St: '{}'\n", st);
                 if (auto op = parse_op.parse(st)) {
-
-                    fmt::print("Parsed op\n");
                     st = op.get_state();
                     st = noam::whitespace.parse(st).get_state();
 
-                    if (noam::result<arith_expr> left_expr = parse_arith_expr
+                    if (noam::result<arith_expr> right_expr = parse_arith_expr
                                                                  .parse(st)) {
-                        st = left_expr.get_state();
-                        fmt::print("Obtained left expr");
+                        st = right_expr.get_state();
                         return noam::result {
                             st,
                             arith_expr {binary_expr<arith_expr> {
-                                std::move(value).get_value(),
                                 std::move(left_expr).get_value(),
+                                std::move(right_expr).get_value(),
                                 op.get_value()}}};
                     }
                 } else {
-                    rva::visit(
-                        [](auto& v) {
-                            if constexpr (std::is_same_v<
-                                              std::decay_t<decltype(v)>,
-                                              constant>) {
-                                fmt::print(
-                                    "Returning simple value: {}\n",
-                                    v.value);
-                            }
-                        },
-                        value.get_value());
-                    return value;
+                    return left_expr;
                 }
             }
             return {};
         }};
     });
+
 } // namespace imp
 int main() {
     auto test = imp::parse_arith_expr.parse("3 + 5 * 7");
