@@ -106,7 +106,8 @@ constexpr auto parse_arith_expr = noam::recurse<arith_expr>(
     [](auto parse_arith_expr) {
         return noam::parser {[=](noam::state_t st) -> noam::result<arith_expr> {
             st = noam::whitespace.parse(st).get_state();
-            if (noam::result<arith_expr> left_expr = parse_cons_or_var.parse(st)) {
+            if (noam::result<arith_expr> left_expr = parse_cons_or_var.parse(
+                    st)) {
                 st = left_expr.get_state();
                 // Read all whitespace
                 st = noam::whitespace.parse(st).get_state();
@@ -115,7 +116,7 @@ constexpr auto parse_arith_expr = noam::recurse<arith_expr>(
                     st = noam::whitespace.parse(st).get_state();
 
                     if (noam::result<arith_expr> right_expr = parse_arith_expr
-                                                                 .parse(st)) {
+                                                                  .parse(st)) {
                         st = right_expr.get_state();
                         return noam::result {
                             st,
