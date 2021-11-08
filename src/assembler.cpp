@@ -41,7 +41,47 @@ constexpr auto parse_op = noam::parser {
         }
         return {};
     }};
+constexpr auto parse_bool_op = noam::parser {
+    [](noam::state_t st) -> noam::result<char> {
+        if (st.empty()) {
+            return {};
+        }
+        if (st.starts_with("and")) {
+            return {st.substr(3), '&'};
+        }
+        if (st.starts_with("or")) {
+            return {st.substr(2), '|'};
+        }
+        return {};
+    }};
+constexpr auto parse_comparison = noam::parser {
+    [](noam::state_t st) -> noam::result<char> {
+        if (st.empty()) {
+            return {};
+        }
+        if (st.starts_with("=")) {
+            return {st.substr(1), '='};
+        }
+        if (st.starts_with("<=")) {
+            // L represents less than
+            return {st.substr(2), 'L'};
+        }
+        if (st.starts_with(">=")) {
+            // G represents greater than
+            return {st.substr(2), 'G'};
+        }
+        if (st.starts_with('<')) {
+            return {st.substr(1), '<'};
+        }
+        if (st.starts_with('>')) {
+            return {st.substr(1), '>'};
+        }
+        return {};
+    }
+};
 constexpr auto parse_constant = noam::make<constant>(noam::parse_long_long);
+constexpr auto parse_bool_const = noam::make<bool_const>(noam::parse_bool);
+
 constexpr auto parse_variable = noam::parser {
     [](noam::state_t st) -> noam::result<variable> {
         std::string_view sv = st;
