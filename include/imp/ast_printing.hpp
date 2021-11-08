@@ -1,14 +1,14 @@
 #pragma once
 
-#include <imp/util/node_id.hpp>
 #include <fstream>
 #include <imp/syntax_types.hpp>
+#include <imp/util/node_id.hpp>
 #include <iostream>
 #include <string>
 
 namespace imp {
-using std::string;
 using std::ostream;
+using std::string;
 
 // By default, there is no styling
 std::string_view style_node(std::vector<command> const&) {
@@ -57,20 +57,38 @@ void declare_nodes(ostream& os, auto const& node) {
     // Declare this node
     os << fmt::format("    {} [{}];\n", get_id(node), style_node(node));
     // Declare the child nodes
-    for_each(node, [&](auto const& child) {
-        declare_nodes(os, child);
-    });
+    for_each(node, [&](auto const& child) { declare_nodes(os, child); });
 }
 
 void print_edges(ostream& os, auto const& node) {
     // For each child, print an edge from this node to the child
     for_each(node, [&](auto const& child) {
-        os <<  fmt::format("    {} -> {};\n", get_id(node), get_id(child));
+        os << fmt::format("    {} -> {};\n", get_id(node), get_id(child));
         print_edges(os, child);
     });
 }
 
 void print_graph(ostream& os, arith_expr const& ast) {
+    os << R"(digraph {
+    graph [
+        bgcolor="#24283B"
+        pad="0.5"
+        dpi=300]
+    node [
+        fontsize=12
+        fontcolor="#ffffff"
+        color="#E0AF68"
+        shape=underline
+        fontname="Hack, monospace"]
+    edge [
+        color="#E0AF68"
+        arrowsize=0.5]
+)";
+    declare_nodes(os, ast);
+    print_edges(os, ast);
+    os << "}\n";
+}
+void print_graph(ostream& os, bool_expr const& ast) {
     os << R"(digraph {
     graph [
         bgcolor="#24283B"
