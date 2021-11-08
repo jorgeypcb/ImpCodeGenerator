@@ -31,14 +31,22 @@ struct comment : std::string_view {
 
 template <class T>
 struct unary_expr {
-    struct expr_data {
-        T value;
-        char op;
-    };
-    copyable_ptr<expr_data> data_ptr;
-    T const& get_input() const { return data_ptr->value; }
-    char get_op() const { return data_ptr->op; }
+    copyable_ptr<T> data_ptr;
+    char op;
+    unary_expr() = default;
+    unary_expr(unary_expr const&) = default;
+    unary_expr(unary_expr&&) = default;
+    unary_expr(T const& value, char op)
+      : data_ptr(value)
+      , op(op) {}
+    unary_expr(T&& value, char op)
+      : data_ptr(std::move(value))
+      , op(op) {}
+    T const& get_input() const { return *data_ptr; }
+    char get_op() const { return op; }
 
+    unary_expr& operator=(unary_expr const&) = default;
+    unary_expr& operator=(unary_expr&&) = default;
     constexpr void for_each(auto&& func) const noexcept { func(get_input()); }
 };
 template <class T>
