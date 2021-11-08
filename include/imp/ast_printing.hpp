@@ -70,6 +70,26 @@ void print_edges(ostream& os, auto const& node) {
     });
 }
 
+void print_graph(ostream& os, arith_expr const& ast) {
+    os << R"(digraph {
+    graph [
+        bgcolor="#24283B"
+        pad="0.5"
+        dpi=300]
+    node [
+        fontsize=12
+        fontcolor="#ffffff"
+        color="#E0AF68"
+        shape=underline
+        fontname="Hack, monospace"]
+    edge [
+        color="#E0AF68"
+        arrowsize=0.5]
+)";
+    declare_nodes(os, ast);
+    print_edges(os, ast);
+    os << "}\n";
+}
 void print_graph(ostream& os, command const& ast) {
     os << R"(digraph {
     graph [
