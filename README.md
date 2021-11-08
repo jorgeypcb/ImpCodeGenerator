@@ -17,7 +17,8 @@ Python
 ```bash
 ./install-dependencies.sh
 ```
-3. ```bash
+3. 
+```bash
 ./build.sh
 ```
 
