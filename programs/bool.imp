@@ -1,0 +1,26 @@
+{- 
+Testing all boolean expressions and inline comments 
+-}
+
+w := 1;
+x := 1;
+y := 2;
+z := 3;
+checker := false;
+while not checker do
+    if w = 1 and x = 1 then 
+        w  := y;
+    else
+        w  := x;
+    fi; 
+    If w = y or w = x then 
+        w := 0; -- here is where we set w to 0 for checker to be true
+    else 
+        w := y;
+    fi; 
+    if w <= 0 then
+        checker := true;
+    else 
+        checker := false;
+    fi; 
+od;
