@@ -32,14 +32,3 @@ The ‘install-dependencies.sh’ script will install the following dependencies
 
 The 'build.sh' script will invoke CMake and download any dependencies that aren't found on the
 system.
-
-## Example
-
-Output of running `build/ast_printing_test`, which prints the syntax tree when
-piped to graphviz:
-
-![](docs/ast-example-output.png)
-
-Corresponding syntax tree:
-
-![](docs/ast-example.png)
