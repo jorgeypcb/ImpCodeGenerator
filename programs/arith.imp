@@ -1,0 +1,18 @@
+{- 
+Testing arithmetic expressions and boolean 
+-}
+
+
+counter := 0;
+x := 0;
+while counter < 10 do
+	x := counter + counter;
+	counter := x + 1;
+od;
+y := counter - x;
+if y = 1 then 
+	z  := y;
+else
+	z  := 0;
+fi;
+output  := z * z;
