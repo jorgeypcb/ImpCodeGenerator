@@ -57,9 +57,14 @@ struct binary_expr {
     };
     copyable_ptr<data> data_ptr;
     char op;
+    binary_expr() = default;
+    binary_expr(binary_expr const&) = default;
+    binary_expr(binary_expr&&) = default;
     binary_expr(T&& left, T&& right, char op)
       : data_ptr(data {std::move(left), std::move(right)})
       , op(op) {}
+    binary_expr& operator=(binary_expr const&) = default;
+    binary_expr& operator=(binary_expr&&) = default;
 
     T const& get_left() const { return data_ptr->left; }
     T const& get_right() const { return data_ptr->right; }
