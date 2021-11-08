@@ -134,6 +134,17 @@ constexpr auto parse_bool_expr = noam::recurse<
     bool_expr>([](auto parse_bool_expr) {
     return noam::parser {[=](noam::state_t st) -> noam::result<bool_expr> {
         st = noam::whitespace.parse(st).get_state();
+        if (st.starts_with("not")) {
+            st.remove_prefix(3);
+            st = noam::whitespace.parse(st).get_state();
+            if (noam::result<bool_expr> expr = parse_bool_expr.parse(st)) {
+                return noam::result<bool_expr> {
+                    expr.get_state(),
+                    unary_expr<bool_expr> {expr.get_value(), '!'}};
+            } else {
+                return {};
+            }
+        }
         if (noam::result<bool_const> lx = parse_bool_const.parse(st)) {
             st = lx.get_state();
             // Read all whitespace
@@ -185,7 +196,7 @@ constexpr auto parse_bool_expr = noam::recurse<
                                     op.get_value()}}};
                         }
                     } else {
-                        return noam::result<bool_expr>{st, lx2};
+                        return noam::result<bool_expr> {st, lx2};
                     }
                 }
             }
@@ -195,7 +206,7 @@ constexpr auto parse_bool_expr = noam::recurse<
 });
 } // namespace imp
 int main() {
-    auto test = imp::parse_bool_expr.parse("3 + 5 * 7 > 10 or 3 > x");
+    auto test = imp::parse_bool_expr.parse("not 3 + 5 * 7 > 10 or 3 > x");
     if (test) {
         auto val = test.get_value();
 
