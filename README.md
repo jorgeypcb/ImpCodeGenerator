@@ -22,13 +22,13 @@ Python
 ./build.sh
 ```
 
-The ‘install-dependencies.sh’ script will install the following dependencies. 
+The ‘install-dependencies.sh’ script will install the following dependencies:
 
-•	Noam parser combinator library
-•	RVA recursive variant library
-•	Fmtlib (C++ library for printing)
-•	Catch2 library for printing
-•	tuplet library (fast tuple type implementation)
+- Noam parser combinator library
+- RVA recursive variant library
+- Fmtlib (C++ library for printing)
+- Catch2 library for printing
+- tuplet library (fast tuple type implementation)
 
 The 'build.sh' script will invoke CMake and download any dependencies that aren't found on the
 system.
