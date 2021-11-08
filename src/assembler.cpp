@@ -77,8 +77,7 @@ constexpr auto parse_comparison = noam::parser {
             return {st.substr(1), '>'};
         }
         return {};
-    }
-};
+    }};
 constexpr auto parse_constant = noam::make<constant>(noam::parse_long_long);
 constexpr auto parse_bool_const = noam::make<bool_const>(noam::parse_bool);
 
@@ -106,36 +105,97 @@ constexpr auto parse_arith_expr = noam::recurse<arith_expr>(
     [](auto parse_arith_expr) {
         return noam::parser {[=](noam::state_t st) -> noam::result<arith_expr> {
             st = noam::whitespace.parse(st).get_state();
-            if (noam::result<arith_expr> left_expr = parse_cons_or_var.parse(
-                    st)) {
-                st = left_expr.get_state();
+            if (noam::result<arith_expr> lx = parse_cons_or_var.parse(st)) {
+                st = lx.get_state();
                 // Read all whitespace
                 st = noam::whitespace.parse(st).get_state();
                 if (auto op = parse_op.parse(st)) {
                     st = op.get_state();
                     st = noam::whitespace.parse(st).get_state();
 
-                    if (noam::result<arith_expr> right_expr = parse_arith_expr
-                                                                  .parse(st)) {
-                        st = right_expr.get_state();
+                    if (noam::result<arith_expr> rx = parse_arith_expr.parse(
+                            st)) {
+                        st = rx.get_state();
                         return noam::result {
                             st,
                             arith_expr {binary_expr<arith_expr> {
-                                std::move(left_expr).get_value(),
-                                std::move(right_expr).get_value(),
+                                std::move(lx).get_value(),
+                                std::move(rx).get_value(),
                                 op.get_value()}}};
                     }
                 } else {
-                    return left_expr;
+                    return lx;
                 }
             }
             return {};
         }};
     });
+constexpr auto parse_bool_expr = noam::recurse<
+    bool_expr>([](auto parse_bool_expr) {
+    return noam::parser {[=](noam::state_t st) -> noam::result<bool_expr> {
+        st = noam::whitespace.parse(st).get_state();
+        if (noam::result<bool_const> lx = parse_bool_const.parse(st)) {
+            st = lx.get_state();
+            // Read all whitespace
+            st = noam::whitespace.parse(st).get_state();
+            if (auto op = parse_bool_op.parse(st)) {
+                st = op.get_state();
+                st = noam::whitespace.parse(st).get_state();
 
+                if (noam::result<bool_expr> rx = parse_bool_expr.parse(st)) {
+                    st = rx.get_state();
+                    return noam::result {
+                        st,
+                        bool_expr {binary_expr<bool_expr> {
+                            std::move(lx).get_value(),
+                            std::move(rx).get_value(),
+                            op.get_value()}}};
+                }
+            } else {
+                return noam::result<bool_expr> {lx.get_state(), lx.get_value()};
+            }
+        }
+        if (noam::result<arith_expr> lx = parse_arith_expr.parse(st)) {
+            st = lx.get_state();
+            st = noam::whitespace.parse(st).get_state();
+            if (auto op = parse_comparison.parse(st)) {
+                st = op.get_state();
+                st = noam::whitespace.parse(st).get_state();
+
+                if (noam::result<arith_expr> rx = parse_arith_expr.parse(st)) {
+                    st = rx.get_state();
+                    // Update lx, then check for a right hand side
+                    auto lx2 = bool_expr {binary_expr<arith_expr> {
+                        std::move(lx).get_value(),
+                        std::move(rx).get_value(),
+                        op.get_value()}};
+                    st = noam::whitespace.parse(st).get_state();
+                    if (auto op = parse_bool_op.parse(st)) {
+                        st = op.get_state();
+                        st = noam::whitespace.parse(st).get_state();
+
+                        if (noam::result<bool_expr> rx = parse_bool_expr.parse(
+                                st)) {
+                            st = rx.get_state();
+                            return noam::result {
+                                st,
+                                bool_expr {binary_expr<bool_expr> {
+                                    std::move(lx2),
+                                    std::move(rx).get_value(),
+                                    op.get_value()}}};
+                        }
+                    } else {
+                        return noam::result<bool_expr>{st, lx2};
+                    }
+                }
+            }
+        }
+        return {};
+    }};
+});
 } // namespace imp
 int main() {
-    auto test = imp::parse_arith_expr.parse("3 + 5 * 7");
+    auto test = imp::parse_bool_expr.parse("3 + 5 * 7 > 10 or 3 > x");
     if (test) {
         auto val = test.get_value();
 
