@@ -3,13 +3,13 @@
 A simple compiler for the IMP programming language
 
 ## Team
-Alecto Perez
-Jorge Loredo
-David Arredondo
+- Alecto Perez
+- Jorge Loredo
+- David Arredondo
 
 ## Languages
-C++ 
-Python 
+- C++ 
+- Python 
 
 ## How to build the project (including dependencies):
 1. 	Make sure gcc-11 is installed https://www.linuxfromscratch.org/blfs/view/svn/general/gcc.html
