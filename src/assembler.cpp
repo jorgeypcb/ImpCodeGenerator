@@ -205,7 +205,8 @@ using command = rva::variant<
     if_command<bool_expr, rva::self_t>, // If statement
     while_loop<bool_expr, rva::self_t>, // while loop
     std::vector<rva::self_t>>;          // List of commands separated by ;
-constexpr auto parse_command = noam::recurse<command>([](auto parse_command) {
+
+constexpr auto parse_one_command = [](auto parse_command) {
     return noam::parser {
         [parse_command = noam::whitespace_enclose(parse_command)](
             noam::state_t st) -> noam::result<command> {
@@ -272,7 +273,9 @@ constexpr auto parse_command = noam::recurse<command>([](auto parse_command) {
             }
             return {};
         }};
-});
+};
+constexpr auto parse_command = noam::recurse<command>(
+    [](auto parse_command) { return parse_one_command(parse_command); });
 } // namespace imp
 int main() {
     auto test = imp::parse_command.parse(
