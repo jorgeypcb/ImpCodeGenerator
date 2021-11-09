@@ -11,3 +11,4 @@ LoadConstant 1 null 3
 JumpIfZero 1 .LBB_2 null
 JumpIfNonzero 1 .LBB_2 null
 Label .LBB_1 null null
+Move 1 null 3
