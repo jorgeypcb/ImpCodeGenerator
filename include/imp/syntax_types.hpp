@@ -166,6 +166,14 @@ void for_each(rva::variant<T...> const& v, F&& func) {
     rva::visit([&](auto const& node) { for_each(node, func); }, v);
 }
 
+template <class T, class F>
+void traverse(T const& tree, F&& func) {
+    func(tree);
+    // Apply self recursively to all of the branches
+    for_each(tree, [&](auto const& branch) {
+        traverse(branch, func);
+    });
+}
 
 
 // clang-format off
