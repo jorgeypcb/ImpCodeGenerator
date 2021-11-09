@@ -103,6 +103,13 @@ struct address_assigner {
 };
 
 struct ir_compiler {
+    // The position to jump to when skip occurs. Set to -1 initially, because
+    // it can only be used inside a loop body
+    int skip_position = -1;
+    // The value of the next lael
+    int next_label = 0;
+    // Gets an unused unique label number
+    int get_next_label() { return next_label++; }
     std::vector<instruction> ins;
 
     // No-op - does nothing
@@ -208,15 +215,85 @@ struct ir_compiler {
             0,
             ass.dest.address});
     }
+    void compile(skip_command const& cmd) {
+        // Jump to the location set for a skip
+        // This should be the condition of a loop, because it skips everything
+        // else in the body
+        ins.push_back(instruction {Op::Jump, skip_position, 0, 0});
+    }
+    void compile(while_loop<bool_expr, command> const& loop) {
+        int loop_condition = get_next_label();
+        int loop_body = get_next_label();
+        int loop_end = get_next_label();
+        // Replace the skip position with the current loop condition. Save it to
+        // 'previous_skip_position'. It'll be restored at the end of the
+        // function
+        int previous_skip_position = std::exchange(
+            skip_position,
+            loop_condition);
+
+        address_t cond_addr = get_address(loop.get_condition());
+
+        // Add the label for the start of the condition
+        ins.push_back(instruction {Op::Label, loop_condition, 0, 0});
+        compile(loop.get_condition());
+        // Jump to the end of the loop if the condition is false
+        ins.push_back(instruction {Op::JumpIfZero, cond_addr, loop_end, 0});
+
+        // Compile the ody of the loop
+        // First: Add a label indicating the start of the body
+        ins.push_back(instruction {Op::Label, loop_body, 0, 0});
+        // Then compile the body of the loop itself
+        compile(loop.get_body());
+
+        // Jump back to the start of the loop
+        ins.push_back(instruction {Op::Jump, loop_condition, 0, 0});
+        // Add a label for the instruction after the end of the loop
+        ins.push_back(instruction {Op::Label, loop_end, 0, 0});
+
+        // Restore the skip position
+        skip_position = previous_skip_position;
+    }
+    void compile(if_command<bool_expr, command> const& if_) {
+        int else_label = get_next_label();
+        int end_of_if = get_next_label();
+
+        address_t cond_addr = get_address(if_.get_condition());
+
+        compile(if_.get_condition());
+        // Jump to the else block if the condition was false
+        ins.push_back(instruction {Op::JumpIfZero, cond_addr, else_label, 0});
+        compile(if_.when_true());
+        // Jump to the end of the if statement after finishing the 'then' block
+        ins.push_back(instruction {Op::Jump, end_of_if, 0, 0});
+        // Add the label for the start of the else block, then compile the else
+        // block
+        ins.push_back(instruction {Op::Label, else_label, 0, 0});
+        compile(if_.when_false());
+
+        // Add a label for the instruction after the end of the if statement
+        ins.push_back(instruction {Op::Label, end_of_if, 0, 0});
+    }
+    void compile(std::vector<command> const& commands) {
+        for (command const& c : commands) {
+            compile(c);
+        }
+    }
     template <class... T>
     void compile(rva::variant<T...> const& v) {
-        rva::visit([this](auto& expr) { compile(expr); }, v);
+        rva::visit([this](auto const& expr) { compile(expr); }, v);
     }
     // Step 3: Translate to Intermediate Representation
-    inline void print(command cmd) {
+    void print(command cmd) {
         address_assigner scope;
         // Give everything an address
         scope.assign_address(cmd);
+
+        // Compile the command into the instruction vector
+        compile(cmd);
+        for(instruction const& i : ins) {
+            fmt::print("{}\n", i);
+        }
     }
 };
 } // namespace imp
