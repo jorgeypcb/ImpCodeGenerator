@@ -200,7 +200,13 @@ struct ir_compiler {
     }
     void compile(assignment<arith_expr> const& ass) {
         compile(ass.value);
-        // TODO: Create move instruction to allow for assignment
+        // Emit an instruction to move the output of the expression into the
+        // destination
+        ins.push_back(instruction {
+            Op::Move,
+            get_address(ass.value),
+            0,
+            ass.dest.address});
     }
     template <class... T>
     void compile(rva::variant<T...> const& v) {
