@@ -40,8 +40,8 @@ enum class OpCategory {
 
 struct instruction {
     Op op {};   // Stores the operand
-    int i1 {};  // Used for input1 and the condition of a jump
-    int i2 {};  // Used for input2 and the location of a jump
+    long long i1 {};  // Used for input1 and the condition of a jump
+    long long i2 {};  // Used for input2 and the location of a jump
     int output; // Used as the destination of an instruction
 
     // Gets the category of an operation based on the operation
