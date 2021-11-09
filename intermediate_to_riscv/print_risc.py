@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import sys
 
 run_imp = '''
@@ -60,13 +59,13 @@ def print_riscv_instruction(instruction):
         riscv = unaryop('a1',i0,'LI') +         save_stack(output,'a1')
         
     elif op == 'Label':
-        riscv = i0 + '\n\t'
+        riscv = i0 + ':\n\t'
     
     elif op == 'Move':
         riscv = load_stack(i0,'a1') +         save_stack(output,'a1')
         
     elif op == 'Jump':
-        riscv = 'JAL x0, ' + i0
+        riscv = 'JAL x0, ' + i0 + '\n\t'
         
     else: assert False, 'operation not found'
     
