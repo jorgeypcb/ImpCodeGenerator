@@ -246,6 +246,19 @@ static_assert(std::is_copy_assignable_v<command>);
 static_assert(std::is_move_assignable_v<arith_expr>);
 static_assert(std::is_move_assignable_v<bool_expr>);
 static_assert(std::is_move_assignable_v<command>);
+
+// Get the address of an arithmetic expression and a boolean expression
+// respectively
+inline address_t get_address(arith_expr const& ex) {
+    return rva::visit(
+        [](auto&& thing) -> address_t { return thing.address; },
+        ex);
+}
+inline address_t get_address(bool_expr const& ex) {
+    return rva::visit(
+        [](auto&& thing) -> address_t { return thing.address; },
+        ex);
+}
 } // namespace imp
 
 // Variables are hashed according to their name
