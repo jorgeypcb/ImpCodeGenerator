@@ -1,5 +1,7 @@
 #pragma once
 #include <imp/syntax_types.hpp>
+#include <imp/util/overload_set.hpp>
+#include <set>
 
 namespace imp {
 using arith_expr = rva::variant<
@@ -20,5 +22,15 @@ using command = rva::variant<
     while_loop<bool_expr, rva::self_t>, // while loop
     std::vector<rva::self_t>>;          // List of commands separated by ;
 
-
+// Step 1: Get a list of all the variables in alphabetical order
+inline std::set<variable> get_variables(command const& program) {
+    std::set<variable> variables;
+    traverse(program, overload_set {
+        [](auto const&) {},
+        [&](variable const& var) { variables.insert(var); } 
+    });
+    return variables;
 }
+
+
+} // namespace imp
