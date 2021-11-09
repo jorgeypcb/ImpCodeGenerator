@@ -26,7 +26,9 @@ enum class Op {
     JumpIfNonzero,
 
     // LabelOp: 1 Label
-    Label
+    Label,
+    // JumpOp: 1 Label (unconditional jump)
+    Jump
 };
 
 // Defines the category of an operation (see above)
@@ -61,7 +63,8 @@ struct instruction {
             case Op::LoadConstant: return OpCategory::LoadConstantOp;
             case Op::JumpIfZero:
             case Op::JumpIfNonzero: return OpCategory::JumpOp;
-            case Op::Label: return OpCategory::LabelOp;
+            case Op::Label: 
+            case Op::Jump: return OpCategory::LabelOp;
         }
 
         // Used if given an unknown opcode
@@ -87,6 +90,7 @@ constexpr static std::string_view to_string(Op o) {
         IMP_ENUM_TO_STR_CASE(Op, JumpIfZero);
         IMP_ENUM_TO_STR_CASE(Op, JumpIfNonzero);
         IMP_ENUM_TO_STR_CASE(Op, Label);
+        IMP_ENUM_TO_STR_CASE(Op, Jump);
     }
 
     // Used if given an unknown opcode
@@ -147,6 +151,7 @@ struct fmt::formatter<imp::instruction> {
                     i1,
                     i2);
             case Op::Label:
+            case Op::Jump:
                 return fmt::format_to(ctx.out(), "{} .LBB_{} null null", op_name, i1);
 
             // Used if given an unknown opcode
@@ -200,6 +205,7 @@ struct fmt::formatter<imp::instruction> {
                     i1,
                     i2);
             case Op::Label:
+            case Op::Jump:
                 return fmt::format_to(ctx.out(), "{} .LBB_{}", op_name, i1);
 
             // Used if given an unknown opcode

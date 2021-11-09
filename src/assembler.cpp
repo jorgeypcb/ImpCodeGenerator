@@ -25,10 +25,16 @@ output := steps
 )";
     auto test = imp::parse_program.parse(program);
     if (test) {
-        auto val = test.get_value();
+        auto program_ast = test.get_value();
 
-        imp::print_graph(std::cout, val);
+        // imp::print_graph(std::cout, program_ast);
+
+        auto variables = imp::get_variables(program_ast);
+
+        imp::ir_compiler compiler{};
+        compiler.print(program_ast);
     } else {
         fmt::print("failed to parse thing\n");
     }
+    return 0;
 }
