@@ -4,6 +4,7 @@
 #include <noam/combinators.hpp>
 #include <rva/variant.hpp>
 #include <string_view>
+#include <utility>
 
 #include <imp/copyable_ptr.hpp>
 
@@ -19,6 +20,9 @@ struct bool_const {
     constexpr void for_each(auto&& func) const noexcept {}
 };
 struct variable {
+    auto operator<=>(variable const&) const = default;
+    bool operator==(variable const&) const = default;
+
     std::string_view name;
     std::string_view get_name() const { return name; }
 
@@ -121,9 +125,7 @@ struct while_loop {
     while_loop(while_loop const&) = default;
     while_loop(while_loop&&) = default;
     while_loop(BExpr&& cond, Cmd&& when_true)
-      : data_ptr(
-          data {std::move(cond), std::move(when_true)}) {
-    }
+      : data_ptr(data {std::move(cond), std::move(when_true)}) {}
 
     while_loop& operator=(while_loop const&) = default;
     while_loop& operator=(while_loop&&) = default;
@@ -212,3 +214,11 @@ static_assert(std::is_move_assignable_v<arith_expr>);
 static_assert(std::is_move_assignable_v<bool_expr>);
 static_assert(std::is_move_assignable_v<command>);
 } // namespace imp
+
+// Variables are hashed according to their name
+template <>
+struct std::hash<imp::variable> {
+    size_t operator()(imp::variable const& v) const noexcept {
+        return std::hash<std::string_view> {}(v.get_name());
+    }
+};
