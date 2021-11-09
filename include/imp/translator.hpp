@@ -1,4 +1,6 @@
 #pragma once
+#include <fmt/core.h>
+#include <imp/instruction.hpp>
 #include <imp/syntax_types.hpp>
 #include <imp/util/overload_set.hpp>
 #include <set>
@@ -97,6 +99,118 @@ struct address_assigner {
             addr++;
         }
         assign_address(program, addr);
+    }
+};
+
+struct ir_compiler {
+    std::vector<instruction> ins;
+
+    // No-op - does nothing
+    void compile(variable const& v) {}
+    void compile(constant const& c) {
+        ins.push_back(instruction {Op::LoadConstant, c.value, 0, c.address});
+    }
+    void compile(bool_const const& c) {
+        ins.push_back(instruction {Op::LoadConstant, c.value, 0, c.address});
+    }
+    void compile(binary_expr<arith_expr> const& b) {
+        compile(b.get_left());
+        compile(b.get_right());
+        instruction i;
+        switch (b.get_op()) {
+            case '+':
+                i = {
+                    Op::Plus,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+                break;
+            case '-':
+                i = {
+                    Op::Minus,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+                break;
+            case '*':
+                i = {
+                    Op::Times,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+                break;
+            case '=':
+                i = {
+                    Op::Equal,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+                break;
+            case '<':
+                i = {
+                    Op::Greater,
+                    // Flip operands: right first
+                    get_address(b.get_right()),
+                    get_address(b.get_left()),
+                    b.address};
+                break;
+            case '>':
+                i = {
+                    Op::Greater,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+                break;
+            case 'L':
+                i = {
+                    Op::GreaterEq,
+                    // flip operands: right first
+                    get_address(b.get_right()),
+                    get_address(b.get_left()),
+                    b.address};
+                break;
+            case 'G':
+                i = {
+                    Op::GreaterEq,
+                    get_address(b.get_left()),
+                    get_address(b.get_right()),
+                    b.address};
+        }
+        ins.push_back(i);
+    }
+    void compile(unary_expr<bool_expr> const& b) {
+        compile(b.get_input());
+        // The only one right now is not, so I didn't bother writing a switch
+        ins.push_back(
+            instruction {Op::Not, get_address(b.get_input()), 0, b.address});
+    }
+    void compile(binary_expr<bool_expr> const& b) {
+        compile(b.get_left());
+        compile(b.get_right());
+        Op op;
+        switch (b.get_op()) {
+            case '&': op = Op::And; break;
+            case '|': op = Op::Or; break;
+        }
+        ins.push_back(instruction {
+            op,
+            get_address(b.get_left()),
+            get_address(b.get_right()),
+            b.address});
+    }
+    void compile(assignment<arith_expr> const& ass) {
+        compile(ass.value);
+        // TODO: Create move instruction to allow for assignment
+    }
+    template <class... T>
+    void compile(rva::variant<T...> const& v) {
+        rva::visit([this](auto& expr) { compile(expr); }, v);
+    }
+    // Step 3: Translate to Intermediate Representation
+    inline void print(command cmd) {
+        address_assigner scope;
+        // Give everything an address
+        scope.assign_address(cmd);
     }
 };
 } // namespace imp
