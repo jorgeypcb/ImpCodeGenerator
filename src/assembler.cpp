@@ -26,10 +26,6 @@ int main(int argc, char** argv) {
     if (parse_result) {
         auto program_ast = parse_result.get_value();
 
-        // imp::print_graph(std::cout, program_ast);
-
-        auto variables = imp::get_variables(program_ast);
-
         imp::ir_compiler compiler {};
         compiler.print(program_ast);
     } else {
