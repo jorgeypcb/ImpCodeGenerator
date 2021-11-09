@@ -63,6 +63,9 @@ def print_riscv_instruction(instruction):
     elif op == 'Move':
         riscv = load_stack(i0,'a1') +         save_stack(output,'a1')
         
+    elif op == 'Jump':
+        riscv = 'JAL x0, ' + i0
+        
     else: assert False, 'operation not found'
     
     return riscv
