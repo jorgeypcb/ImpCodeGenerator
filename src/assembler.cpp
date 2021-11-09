@@ -208,7 +208,7 @@ using command = rva::variant<
 
 constexpr auto parse_one_command = [](auto parse_command) {
     return noam::parser {
-        [parse_command = noam::whitespace_enclose(parse_command)](
+        [parse_sub_cmd = noam::whitespace_enclose(parse_command)](
             noam::state_t st) -> noam::result<command> {
             constexpr auto parse_condition = noam::whitespace_enclose(
                 parse_bool_expr);
@@ -224,12 +224,12 @@ constexpr auto parse_one_command = [](auto parse_command) {
                     return {};
                 if (!noam::literal<"then">.read(st))
                     return {};
-                noam::result<command> when_true = parse_command.read(st);
+                noam::result<command> when_true = parse_sub_cmd.read(st);
                 if (!when_true)
                     return {};
                 if (!noam::literal<"else">.read(st))
                     return {};
-                noam::result<command> when_false = parse_command.read(st);
+                noam::result<command> when_false = parse_sub_cmd.read(st);
                 if (!when_false)
                     return {};
                 if (!noam::literal<"fi">.read(st))
@@ -248,7 +248,7 @@ constexpr auto parse_one_command = [](auto parse_command) {
                     return {};
                 if (!noam::literal<"do">.read(st))
                     return {};
-                noam::result<command> when_true = parse_command.read(st);
+                noam::result<command> when_true = parse_sub_cmd.read(st);
                 if (!when_true)
                     return {};
                 if (!noam::literal<"od">.read(st))
@@ -274,12 +274,36 @@ constexpr auto parse_one_command = [](auto parse_command) {
             return {};
         }};
 };
-constexpr auto parse_command = noam::recurse<command>(
-    [](auto parse_command) { return parse_one_command(parse_command); });
+constexpr auto parse_command = noam::recurse<command>([](auto self) {
+    return noam::parser {
+        [parse_one = parse_one_command(self)](
+            noam::state_t st) -> noam::result<command> {
+            auto first_command = parse_one.read(st);
+            // If there's no first command, return an empty vector
+            if (!first_command)
+                return {st, command {std::vector<command> {}}};
+            
+            constexpr auto sep = noam::whitespace_enclose(noam::literal<';'>);
+            
+            std::vector<command> all;
+            all.push_back(std::move(first_command.get_value()));
+
+            auto next_command = noam::join(sep, parse_one);
+            
+            while (auto next = next_command.read(st)) {
+                all.push_back(next.get_value());
+            }
+            if (all.size() > 1) {
+                return {st, command{all}};
+            } else {
+                return {st, std::move(all[0])};
+            }
+        }};
+});
 } // namespace imp
 int main() {
     auto test = imp::parse_command.parse(
-        "if true then x := x + y * z else x := x - 1 fi");
+        "if true then x := x + y * z else x := x - 1; y := y * 2 fi");
     if (test) {
         auto val = test.get_value();
 
