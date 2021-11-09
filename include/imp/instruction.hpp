@@ -16,6 +16,7 @@ enum class Op {
 
     // Unary op: 1 Input, 1 Output
     Not,
+    Move,
 
     // LoadConstantOp: 1 constant, 1 output
     LoadConstant,
@@ -56,6 +57,7 @@ struct instruction {
             case Op::Or:
             case Op::And: return OpCategory::BinaryOp;
             case Op::Not: return OpCategory::UnaryOp;
+            case Op::Move: return OpCategory::UnaryOp;
             case Op::LoadConstant: return OpCategory::LoadConstantOp;
             case Op::JumpIfZero:
             case Op::JumpIfNonzero: return OpCategory::JumpOp;
@@ -80,6 +82,7 @@ constexpr static std::string_view to_string(Op o) {
         IMP_ENUM_TO_STR_CASE(Op, Or);
         IMP_ENUM_TO_STR_CASE(Op, And);
         IMP_ENUM_TO_STR_CASE(Op, Not);
+        IMP_ENUM_TO_STR_CASE(Op, Move);
         IMP_ENUM_TO_STR_CASE(Op, LoadConstant);
         IMP_ENUM_TO_STR_CASE(Op, JumpIfZero);
         IMP_ENUM_TO_STR_CASE(Op, JumpIfNonzero);
@@ -131,6 +134,8 @@ struct fmt::formatter<imp::instruction> {
                     out);
             case Op::Not:
                 return fmt::format_to(ctx.out(), "{} {} null {}", op_name, i1, out);
+            case Op::Move:
+                return fmt::format_to(ctx.out(), "{} {} null {}", op_name, i1, out);
             case Op::LoadConstant:
                 return fmt::format_to(ctx.out(), "{} {} null {}", op_name, i1, out);
             case Op::JumpIfZero:
@@ -181,6 +186,8 @@ struct fmt::formatter<imp::instruction> {
                     i2,
                     out);
             case Op::Not:
+                return fmt::format_to(ctx.out(), "{} {} {}", op_name, i1, out);
+            case Op::Move:
                 return fmt::format_to(ctx.out(), "{} {} {}", op_name, i1, out);
             case Op::LoadConstant:
                 return fmt::format_to(ctx.out(), "{} {} {}", op_name, i1, out);
