@@ -57,7 +57,6 @@ struct unary_expr {
     unary_expr(T&& value, char op)
       : data_ptr(std::move(value))
       , op(op) {}
-    
     T& get_input() { return *data_ptr; }
     T const& get_input() const { return *data_ptr; }
     char get_op() const { return op; }
@@ -188,15 +187,19 @@ void for_each(rva::variant<T...> const& v, F&& func) {
     rva::visit([&](auto const& node) { for_each(node, func); }, v);
 }
 
+// Traverses an AST
 template <class T, class F>
 void traverse(T const& tree, F&& func) {
     func(tree);
     // Apply self recursively to all of the branches
-    for_each(tree, [&](auto const& branch) {
-        traverse(branch, func);
-    });
+    for_each(tree, [&](auto const& branch) { traverse(branch, func); });
 }
-
+// Traverses an AST depth-first: branches are traversed before the node itself
+template <class T, class F>
+void traverse_depth_first(T const& tree, F&& func) {
+    for_each(tree, [&](auto const& branch) { traverse(branch, func); });
+    func(tree);
+}
 
 // clang-format off
 /**
