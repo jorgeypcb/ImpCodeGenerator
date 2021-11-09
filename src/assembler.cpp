@@ -1,6 +1,7 @@
 #include <fmt/core.h>
 #include <imp/ast_printing.hpp>
 #include <imp/parsers/command.hpp>
+#include <imp/translator.hpp>
 
 int main() {
     std::string_view program = R"(
