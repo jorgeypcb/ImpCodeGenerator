@@ -2,30 +2,30 @@ import sys
 
 run_imp = '''
 run_imp(long*):
-/taddi    sp, sp, -2032
-/tsd      ra, 2024(sp)                    # 8-byte Folded
-/tsd      s0, 2016(sp)                    # 8-byte Folded
-/tlui     a1, 32
-/taddiw   a1, a1, -2000
-/tsub     sp, sp, a1
-/tmv      s0, a0
-/taddi    a0, sp, 16
-/taddi    a2, zero, 120
-/tmv      a1, s0
-/tcall    memcpy@plt
-/taddi    a0, sp, 16
-/tcall    run_imp_actual(long*)
-/taddi    a1, sp, 16
-/taddi    a2, zero, 120
-/tmv      a0, s0
-/tcall    memcpy@plt
-/tlui     a0, 32
-/taddiw   a0, a0, -2000
-/tadd     sp, sp, a0
-/tld      s0, 2016(sp)                    # 8-byte Folded Reload
-/tld      ra, 2024(sp)                    # 8-byte Folded Reload
-/taddi    sp, sp, 2032
-/tret
+	addi    sp, sp, -2032
+	sd      ra, 2024(sp)                    # 8-byte Folded
+	sd      s0, 2016(sp)                    # 8-byte Folded
+	lui     a1, 32
+	addiw   a1, a1, -2000
+	sub     sp, sp, a1
+	mv      s0, a0
+	addi    a0, sp, 16
+	addi    a2, zero, 120
+	mv      a1, s0
+	call    memcpy@plt
+	addi    a0, sp, 16
+	call    run_imp_actual(long*)
+	addi    a1, sp, 16
+	addi    a2, zero, 120
+	mv      a0, s0
+	call    memcpy@plt
+	lui     a0, 32
+	addiw   a0, a0, -2000
+	add     sp, sp, a0
+	ld      s0, 2016(sp)                    # 8-byte Folded Reload
+	ld      ra, 2024(sp)                    # 8-byte Folded Reload
+	addi    sp, sp, 2032
+	ret
 '''
 
 def print_riscv_instruction(instruction):
