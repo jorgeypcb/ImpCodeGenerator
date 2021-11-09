@@ -98,7 +98,7 @@ struct if_command {
 
     if_command& operator=(if_command const&) = default;
     if_command& operator=(if_command&&) = default;
-    
+
     BExpr const& get_condition() const { return data_ptr->condition; }
     Cmd const& when_true() const { return data_ptr->when_true; }
     Cmd const& when_false() const { return data_ptr->when_false; }
@@ -116,6 +116,18 @@ struct while_loop {
         Cmd body;
     };
     copyable_ptr<data> data_ptr;
+
+    while_loop() = default;
+    while_loop(while_loop const&) = default;
+    while_loop(while_loop&&) = default;
+    while_loop(BExpr&& cond, Cmd&& when_true)
+      : data_ptr(
+          data {std::move(cond), std::move(when_true)}) {
+    }
+
+    while_loop& operator=(while_loop const&) = default;
+    while_loop& operator=(while_loop&&) = default;
+
     BExpr const& get_condition() const { return data_ptr->condition; }
     Cmd const& get_body() const { return data_ptr->body; }
 
