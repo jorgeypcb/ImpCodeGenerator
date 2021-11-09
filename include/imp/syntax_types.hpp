@@ -87,6 +87,18 @@ struct if_command {
         Cmd when_false;
     };
     copyable_ptr<data> data_ptr;
+
+    if_command() = default;
+    if_command(if_command const&) = default;
+    if_command(if_command&&) = default;
+    if_command(BExpr&& cond, Cmd&& when_true, Cmd&& when_false)
+      : data_ptr(
+          data {std::move(cond), std::move(when_true), std::move(when_false)}) {
+    }
+
+    if_command& operator=(if_command const&) = default;
+    if_command& operator=(if_command&&) = default;
+    
     BExpr const& get_condition() const { return data_ptr->condition; }
     Cmd const& when_true() const { return data_ptr->when_true; }
     Cmd const& when_false() const { return data_ptr->when_false; }
