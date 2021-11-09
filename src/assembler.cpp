@@ -1,37 +1,36 @@
 #include <fmt/core.h>
 #include <imp/ast_printing.hpp>
+#include <imp/comment.hpp>
 #include <imp/parsers/command.hpp>
+#include <imp/read_file.hpp>
 #include <imp/translator.hpp>
 
-int main() {
-    std::string_view program = R"(
-n := input;
-steps := 0;
-while n > 1 do
-  rem := n;
-  quot := 0;
-  while rem > 1 do
-    rem := rem - 2;
-    quot := quot + 1
-  od;
-  if rem = 0 then
-    n := quot
-  else
-    n := 3*n+1
-  fi;
-  steps := steps + 1
-od;
-output := steps
-)";
-    auto test = imp::parse_program.parse(program);
-    if (test) {
-        auto program_ast = test.get_value();
+int main(int argc, char** argv) {
+    if (argc == 1) {
+        fmt::print("Fatal Error: No input files.\n");
+        fmt::print("Usage:\n\n\t{} <filename>", argv[0]);
+        return 1;
+    }
+
+    std::string file = imp::read_file(argv[1]);
+    auto program = imp::filter_comments(file);
+
+    auto parse_result = imp::parse_program.parse(program);
+    if (!parse_result.get_state().empty()) {
+        fmt::print("Unable to finish parsing program.\n");
+        fmt::print(
+            "Error beginning here: \n\n{}",
+            std::string_view(parse_result.get_state()));
+        return 1;
+    }
+    if (parse_result) {
+        auto program_ast = parse_result.get_value();
 
         // imp::print_graph(std::cout, program_ast);
 
         auto variables = imp::get_variables(program_ast);
 
-        imp::ir_compiler compiler{};
+        imp::ir_compiler compiler {};
         compiler.print(program_ast);
     } else {
         fmt::print("failed to parse thing\n");
