@@ -293,6 +293,9 @@ constexpr auto parse_command = noam::recurse<command>([](auto self) {
             while (auto next = next_command.read(st)) {
                 all.push_back(next.get_value());
             }
+
+            // Read the separator if it was at the end with no command present
+            sep.read(st);
             if (all.size() > 1) {
                 return {st, command{all}};
             } else {
@@ -300,10 +303,29 @@ constexpr auto parse_command = noam::recurse<command>([](auto self) {
             }
         }};
 });
+constexpr auto parse_program = noam::whitespace_enclose(parse_command);
 } // namespace imp
 int main() {
-    auto test = imp::parse_command.parse(
-        "if true then x := x + y * z else x := x - 1; y := y * 2 fi");
+    std::string_view program = R"(
+n := input;
+steps := 0;
+while n > 1 do
+  rem := n;
+  quot := 0;
+  while rem > 1 do
+    rem := rem - 2;
+    quot := quot + 1
+  od;
+  if rem = 0 then
+    n := quot
+  else
+    n := 3*n+1
+  fi;
+  steps := steps + 1
+od;
+output := steps
+)";
+    auto test = imp::parse_program.parse(program);
     if (test) {
         auto val = test.get_value();
 
