@@ -59,6 +59,9 @@ def print_riscv_instruction(instruction):
         
     elif op == 'Label':
         riscv = i0 + '\n\t'
+    
+    elif op == 'Move':
+        riscv = load_stack(i0,'a1') +         save_stack(output,'a1')
         
     else: assert False, 'operation not found'
     
