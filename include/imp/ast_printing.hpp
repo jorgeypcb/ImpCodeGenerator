@@ -11,29 +11,29 @@ using std::ostream;
 using std::string;
 
 // By default, there is no styling
-std::string_view style_node(std::vector<command> const&) {
+inline std::string_view style_node(std::vector<command> const&) {
     return R"(label="[list of commands]")";
 }
 template <class Expr>
 std::string_view style_node(assignment<Expr> const&) {
     return R"(fontname="Hack italic, monospace italic"; label="assignment")";
 }
-auto style_node(bool_const const& node) {
+inline auto style_node(bool_const const& node) {
     return fmt::format(R"(fontcolor="#9ECE6A"; label="{}")", node.value);
 }
-auto style_node(constant const& node) {
+inline auto style_node(constant const& node) {
     return fmt::format(R"(fontcolor="#9ECE6A"; label="{}")", node.value);
 }
-std::string_view style_node(while_loop<bool_expr, command> const&) {
+inline std::string_view style_node(while_loop<bool_expr, command> const&) {
     return R"(fontcolor="#BB9AF7"; label="while loop")";
 }
-std::string_view style_node(if_command<bool_expr, command> const&) {
+inline std::string_view style_node(if_command<bool_expr, command> const&) {
     return R"(fontcolor="#BB9AF7"; label="conditional")";
 }
-std::string_view style_node(skip_command const&) {
+inline std::string_view style_node(skip_command const&) {
     return R"(fontcolor="#BB9AF7"; label="skip")";
 }
-auto style_node(variable const& node) {
+inline auto style_node(variable const& node) {
     return fmt::format(R"(fontcolor="#7AA2F7"; label="{}")", node.get_name());
 }
 template <class Expr>
@@ -68,7 +68,7 @@ void print_edges(ostream& os, auto const& node) {
     });
 }
 
-void print_graph(ostream& os, arith_expr const& ast) {
+inline void print_graph(ostream& os, arith_expr const& ast) {
     os << R"(digraph {
     graph [
         bgcolor="#24283B"
@@ -88,7 +88,7 @@ void print_graph(ostream& os, arith_expr const& ast) {
     print_edges(os, ast);
     os << "}\n";
 }
-void print_graph(ostream& os, bool_expr const& ast) {
+inline void print_graph(ostream& os, bool_expr const& ast) {
     os << R"(digraph {
     graph [
         bgcolor="#24283B"
@@ -108,7 +108,7 @@ void print_graph(ostream& os, bool_expr const& ast) {
     print_edges(os, ast);
     os << "}\n";
 }
-void print_graph(ostream& os, command const& ast) {
+inline void print_graph(ostream& os, command const& ast) {
     os << R"(digraph {
     graph [
         bgcolor="#24283B"
@@ -129,7 +129,7 @@ void print_graph(ostream& os, command const& ast) {
     os << "}\n";
 }
 // ast_to_dotfile
-void ast_to_dotfile(string fname, command const& ast) {
+inline void ast_to_dotfile(string fname, command const& ast) {
     // Open the file
     std::ofstream dotfile(fname);
 
