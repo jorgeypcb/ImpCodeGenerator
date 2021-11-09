@@ -1,10 +1,6 @@
 #include <fmt/core.h>
 #include <imp/ast_printing.hpp>
-#include <imp/syntax_types.hpp>
 #include <imp/parsers/command.hpp>
-#include <imp/parsers/basic_parsers.hpp>
-#include <imp/parsers/arith_expr.hpp>
-#include <imp/parsers/bool_expr.hpp>
 
 int main() {
     std::string_view program = R"(
