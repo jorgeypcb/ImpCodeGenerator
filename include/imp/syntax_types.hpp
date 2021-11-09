@@ -9,13 +9,20 @@
 #include <imp/copyable_ptr.hpp>
 
 namespace imp {
+// Memory location in the intermediate representation
+using address_t = int;
+
 struct constant {
     long long value;
+    // Address in the intermediate representation
+    address_t address {};
 
     constexpr void for_each(auto&& func) const noexcept {}
 };
 struct bool_const {
     bool value;
+    // Address in the intermediate representation
+    address_t address {};
 
     constexpr void for_each(auto&& func) const noexcept {}
 };
@@ -24,6 +31,8 @@ struct variable {
     bool operator==(variable const&) const = default;
 
     std::string_view name;
+    // Address in the intermediate representation
+    address_t address {};
     std::string_view get_name() const { return name; }
 
     constexpr void for_each(auto&& func) const noexcept {}
@@ -37,6 +46,8 @@ template <class T>
 struct unary_expr {
     copyable_ptr<T> data_ptr;
     char op;
+    // Address in the intermediate representation
+    address_t address {};
     unary_expr() = default;
     unary_expr(unary_expr const&) = default;
     unary_expr(unary_expr&&) = default;
@@ -46,6 +57,8 @@ struct unary_expr {
     unary_expr(T&& value, char op)
       : data_ptr(std::move(value))
       , op(op) {}
+    
+    T& get_input() { return *data_ptr; }
     T const& get_input() const { return *data_ptr; }
     char get_op() const { return op; }
 
@@ -60,6 +73,8 @@ struct binary_expr {
         T right;
     };
     copyable_ptr<data> data_ptr;
+    // Address in the intermediate representation
+    address_t address {};
     char op;
     binary_expr() = default;
     binary_expr(binary_expr const&) = default;
@@ -70,6 +85,8 @@ struct binary_expr {
     binary_expr& operator=(binary_expr const&) = default;
     binary_expr& operator=(binary_expr&&) = default;
 
+    T& get_left() { return data_ptr->left; }
+    T& get_right() { return data_ptr->right; }
     T const& get_left() const { return data_ptr->left; }
     T const& get_right() const { return data_ptr->right; }
     char get_op() const { return op; }
@@ -103,6 +120,9 @@ struct if_command {
     if_command& operator=(if_command const&) = default;
     if_command& operator=(if_command&&) = default;
 
+    BExpr& get_condition() { return data_ptr->condition; }
+    Cmd& when_true() { return data_ptr->when_true; }
+    Cmd& when_false() { return data_ptr->when_false; }
     BExpr const& get_condition() const { return data_ptr->condition; }
     Cmd const& when_true() const { return data_ptr->when_true; }
     Cmd const& when_false() const { return data_ptr->when_false; }
@@ -130,6 +150,8 @@ struct while_loop {
     while_loop& operator=(while_loop const&) = default;
     while_loop& operator=(while_loop&&) = default;
 
+    BExpr& get_condition() { return data_ptr->condition; }
+    Cmd& get_body() { return data_ptr->body; }
     BExpr const& get_condition() const { return data_ptr->condition; }
     Cmd const& get_body() const { return data_ptr->body; }
 
