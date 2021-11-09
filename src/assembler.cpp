@@ -21,12 +21,6 @@ using bool_expr = rva::variant<
     binary_expr<rva::self_t>, // Binary operation on boolean expression
     binary_expr<arith_expr>>; // Comparison on arithmetic expressions
 
-using command = rva::variant<
-    assignment<arith_expr>,             // Assignment command
-    skip_command,                       // Skip command
-    if_command<bool_expr, rva::self_t>, // If statement
-    while_loop<bool_expr, rva::self_t>, // while loop
-    std::vector<rva::self_t>>;          // List of commands separated by ;
 
 constexpr auto parse_op = noam::parser {
     [](noam::state_t st) -> noam::result<char> {
@@ -204,9 +198,85 @@ constexpr auto parse_bool_expr = noam::recurse<
         return {};
     }};
 });
+
+using command = rva::variant<
+    assignment<arith_expr>,             // Assignment command
+    skip_command,                       // Skip command
+    if_command<bool_expr, rva::self_t>, // If statement
+    while_loop<bool_expr, rva::self_t>, // while loop
+    std::vector<rva::self_t>>;          // List of commands separated by ;
+constexpr auto parse_command = noam::recurse<command>([](auto parse_command) {
+    return noam::parser {
+        [parse_command = noam::whitespace_enclose(parse_command)](
+            noam::state_t st) -> noam::result<command> {
+            constexpr auto parse_condition = noam::whitespace_enclose(
+                parse_bool_expr);
+            const auto empty_command = command {std::vector<command> {}};
+
+            // Parse a command
+            if (auto res = noam::literal<"skip">.read(st)) {
+                return {st, skip_command {}};
+            }
+            if (noam::literal<"if">.read(st)) {
+                noam::result<bool_expr> cond = parse_condition.read(st);
+                if (!cond)
+                    return {};
+                if (!noam::literal<"then">.read(st))
+                    return {};
+                noam::result<command> when_true = parse_command.read(st);
+                if (!when_true)
+                    return {};
+                if (!noam::literal<"else">.read(st))
+                    return {};
+                noam::result<command> when_false = parse_command.read(st);
+                if (!when_false)
+                    return {};
+                if (!noam::literal<"fi">.read(st))
+                    return {};
+
+                return noam::result<command> {
+                    st,
+                    if_command<bool_expr, command>(
+                        std::move(cond).get_value(),
+                        std::move(when_true).get_value(),
+                        std::move(when_false).get_value())};
+            }
+            if (noam::literal<"while">.read(st)) {
+                noam::result<bool_expr> cond = parse_condition.read(st);
+                if (!cond)
+                    return {};
+                if (!noam::literal<"do">.read(st))
+                    return {};
+                noam::result<command> when_true = parse_command.read(st);
+                if (!when_true)
+                    return {};
+                if (!noam::literal<"od">.read(st))
+                    return {};
+                return noam::result<command> {
+                    st,
+                    while_loop {
+                        std::move(cond).get_value(),
+                        std::move(when_true).get_value()}};
+            }
+            if (auto var = parse_variable.read(st)) {
+                if (!noam::whitespace_enclose(noam::literal<":=">).read(st))
+                    return {};
+                auto value = parse_arith_expr.read(st);
+                if (!value)
+                    return {};
+                return noam::result<command> {
+                    st,
+                    assignment<arith_expr> {
+                        std::move(var).get_value(),
+                        std::move(value).get_value()}};
+            }
+            return {};
+        }};
+});
 } // namespace imp
 int main() {
-    auto test = imp::parse_bool_expr.parse("not 3 + 5 * 7 > 10 or 3 > x");
+    auto test = imp::parse_command.parse(
+        "if true then x := x + y * z else x := x - 1 fi");
     if (test) {
         auto val = test.get_value();
 
