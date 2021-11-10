@@ -20,7 +20,7 @@ int main(int argc, char const* argv[]) {
 
     printf("Initial values:\n\t");
     print_values(values, argc - 1);
-    run_imp(values);
+    run_imp_actual(values);
     printf("Final values:\n\t");
     print_values(values, argc - 1);
     return 0;
