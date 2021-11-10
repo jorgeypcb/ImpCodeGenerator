@@ -91,7 +91,7 @@ run_imp_actual:
 	.LBB_2:
 	LD a1, 40(a0)
 	SD a1, 16(a0)
-	
+	ret
 
 .globl run_imp_actual
 

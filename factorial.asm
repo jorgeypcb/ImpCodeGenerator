@@ -37,7 +37,7 @@ run_imp_actual:
 	SD a1, 16(a0)
 	LD a1, 24(a0)
 	SD a1, 0(a0)
-	
+	ret
 
 .globl run_imp_actual
 
