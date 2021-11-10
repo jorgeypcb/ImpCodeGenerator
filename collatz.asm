@@ -1,4 +1,4 @@
-run_imp_actual(long*):
+run_imp_actual:
 	LD a1, 0(a0)
 	SD a1, 8(a0)
 	LI a1, 0
@@ -93,7 +93,9 @@ run_imp_actual(long*):
 	SD a1, 16(a0)
 	
 
-run_imp(long*):
+.globl run_imp_actual
+
+run_imp:
 	addi    sp, sp, -2032
 	sd      ra, 2024(sp)                    # 8-byte Folded
 	sd      s0, 2016(sp)                    # 8-byte Folded
@@ -106,7 +108,7 @@ run_imp(long*):
 	mv      a1, s0
 	call    memcpy@plt
 	addi    a0, sp, 16
-	call    run_imp_actual(long*)
+	call    run_imp_actual
 	addi    a1, sp, 16
 	addi    a2, zero, 120
 	mv      a0, s0
