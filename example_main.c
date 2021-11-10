@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-void run_imp(int64_t* values);
+void run_imp_actual(int64_t* values);
 
 void print_values(int64_t* arr, size_t N) {
     for(size_t i = 0; i < N; i++) {
@@ -12,9 +12,8 @@ void print_values(int64_t* arr, size_t N) {
 }
 
 int main(int argc, char const* argv[]) {
-
     // Holds values
-    int64_t values[1024]{};
+    int64_t values[16384]{};
     for (int i = 1; i < argc; i++) {
         values[i] = atoll(argv[i]);
     }
