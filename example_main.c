@@ -13,7 +13,7 @@ void print_values(int64_t* arr, size_t N) {
 
 int main(int argc, char const* argv[]) {
     // Holds values
-    int64_t values[16384]{};
+    int64_t values[16384] = {0};
     for (int i = 1; i < argc; i++) {
         values[i] = atoll(argv[i]);
     }
