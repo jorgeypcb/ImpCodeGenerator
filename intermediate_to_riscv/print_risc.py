@@ -77,6 +77,7 @@ def print_run_imp_actual(instructions):
     run_imp_actual = 'run_imp_actual:\n\t'
     for i in instructions:
         run_imp_actual+=print_riscv_instruction(i)
+    run_imp_actual += 'ret'
     return run_imp_actual
     
 with open(str(sys.argv[1]), 'r') as f:
