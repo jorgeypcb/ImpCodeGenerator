@@ -76,7 +76,7 @@ struct address_assigner {
     void assign_address(if_command<bool_expr, command>& if_, address_t addr) {
         assign_address(if_.get_condition(), addr);
         assign_address(if_.when_true(), addr);
-        assign_address(if_.when_true(), addr);
+        assign_address(if_.when_false(), addr);
     }
     void assign_address(
         while_loop<bool_expr, command>& while_,
@@ -291,7 +291,7 @@ struct ir_compiler {
 
         // Compile the command into the instruction vector
         compile(cmd);
-        for(instruction const& i : ins) {
+        for (instruction const& i : ins) {
             fmt::print("{}\n", i);
         }
     }
