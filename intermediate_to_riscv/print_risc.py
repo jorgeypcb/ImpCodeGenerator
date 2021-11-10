@@ -1,8 +1,9 @@
-#!/usr/bin/env python
 import sys
 
 run_imp = '''
-run_imp(long*):
+.globl run_imp_actual
+
+run_imp:
 	addi    sp, sp, -2032
 	sd      ra, 2024(sp)                    # 8-byte Folded
 	sd      s0, 2016(sp)                    # 8-byte Folded
@@ -15,7 +16,7 @@ run_imp(long*):
 	mv      a1, s0
 	call    memcpy@plt
 	addi    a0, sp, 16
-	call    run_imp_actual(long*)
+	call    run_imp_actual
 	addi    a1, sp, 16
 	addi    a2, zero, 120
 	mv      a0, s0
@@ -73,7 +74,7 @@ def print_riscv_instruction(instruction):
     return riscv
 
 def print_run_imp_actual(instructions):
-    run_imp_actual = 'run_imp_actual(long*):\n\t'
+    run_imp_actual = 'run_imp_actual:\n\t'
     for i in instructions:
         run_imp_actual+=print_riscv_instruction(i)
     return run_imp_actual
