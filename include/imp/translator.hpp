@@ -29,23 +29,23 @@ using command = rva::variant<
 // Step 2: assign addresses to variables and temporaries
 
 // Step 1 - function to get all the variables
-inline std::set<variable> get_variables(command const& program) {
-    std::set<variable> variables;
+inline std::set<std::string_view> get_variables(command const& program) {
+    std::set<std::string_view> variables;
     traverse(
         program,
         overload_set {
             [](auto const&) {},
-            [&](variable const& var) { variables.insert(var); }});
+            [&](variable const& var) { variables.insert(var.get_name()); }});
     return variables;
 }
 
 // Step 2 - class to assign addresses to everything
 // Assigns addresses to variables, temporaries, and constants
 struct address_assigner {
-    std::set<variable> variables;
-    std::unordered_map<variable, address_t> var_addresses;
+    std::set<std::string_view> variables;
+    std::unordered_map<std::string_view, address_t> var_addresses;
     void assign_address(variable& var, address_t) {
-        var.address = var_addresses[var];
+        var.address = var_addresses[var.get_name()];
     }
     void assign_address(constant& c, address_t addr) { c.address = addr; }
     void assign_address(bool_const& c, address_t addr) { c.address = addr; }
@@ -94,8 +94,8 @@ struct address_assigner {
         var_addresses.reserve(variables.size());
 
         address_t addr = 0;
-        for (auto const& var : variables) {
-            var_addresses[var] = addr;
+        for (std::string_view var_name : variables) {
+            var_addresses[var_name] = addr;
             addr++;
         }
         assign_address(program, addr);
