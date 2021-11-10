@@ -27,8 +27,10 @@ struct bool_const {
     constexpr void for_each(auto&& func) const noexcept {}
 };
 struct variable {
-    auto operator<=>(variable const&) const = default;
-    bool operator==(variable const&) const = default;
+    constexpr auto operator<=>(variable const& other) const {
+        return name <=> other.name;
+    }
+    bool operator==(variable const& other) const { return name == other.name; }
 
     std::string_view name;
     // Address in the intermediate representation
