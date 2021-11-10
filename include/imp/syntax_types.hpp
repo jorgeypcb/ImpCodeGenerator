@@ -196,11 +196,19 @@ void traverse(T const& tree, F&& func) {
     // Apply self recursively to all of the branches
     for_each(tree, [&](auto const& branch) { traverse(branch, func); });
 }
+template <class... T, class F>
+void traverse(rva::variant<T...> const& thing, F&& func) {
+    rva::visit([&](auto const& node) { traverse(node, func); }, thing);
+}
 // Traverses an AST depth-first: branches are traversed before the node itself
 template <class T, class F>
 void traverse_depth_first(T const& tree, F&& func) {
     for_each(tree, [&](auto const& branch) { traverse(branch, func); });
     func(tree);
+}
+template <class... T, class F>
+void traverse_depth_first(rva::variant<T...> const& thing, F&& func) {
+    rva::visit([&](auto const& node) { traverse_depth_first(node, func); }, thing);
 }
 
 // clang-format off
