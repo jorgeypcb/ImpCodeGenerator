@@ -1,0 +1,20 @@
+Unable to finish parsing program.
+Error beginning here: 
+
+while not checker do
+    if w = 1 and x = 1 then 
+        w  := y;
+    else
+        w  := x;
+    fi; 
+    If w = y or w = x then 
+        w := 0; 
+    else 
+        w := y;
+    fi; 
+    if w <= 0 then
+        checker := true;
+    else 
+        checker := false;
+    fi; 
+od;

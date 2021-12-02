@@ -1,0 +1,70 @@
+digraph {
+    graph [
+        bgcolor="#24283B"
+        pad="0.5"
+        dpi=300]
+    node [
+        fontsize=12
+        fontcolor="#ffffff"
+        color="#E0AF68"
+        shape=underline
+        fontname="Hack, monospace"]
+    edge [
+        color="#E0AF68"
+        arrowsize=0.5]
+    s18x7ffcf2c6f150 [label="[list of commands]"];
+    s38x55d1b3f0cb60 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0cb60 [fontcolor="#7AA2F7"; label="y"];
+    s18x55d1b3f0cb78 [fontcolor="#7AA2F7"; label="x"];
+    s38x55d1b3f0cba0 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0cba0 [fontcolor="#7AA2F7"; label="z"];
+    s10x55d1b3f0cbb8 [fontcolor="#9ECE6A"; label="1"];
+    s08x55d1b3f0cbe0 [fontcolor="#BB9AF7"; label="while loop"];
+    s10x55d1b3f0c750 [fontname="Hack bold, monospace bold"; label=">"];
+    s18x55d1b3f0c500 [fontcolor="#7AA2F7"; label="y"];
+    s10x55d1b3f0c520 [fontcolor="#9ECE6A"; label="1"];
+    s18x55d1b3f0c768 [label="[list of commands]"];
+    s38x55d1b3f0c470 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0c470 [fontcolor="#7AA2F7"; label="z"];
+    s10x55d1b3f0c488 [fontname="Hack bold, monospace bold"; label="*"];
+    s18x55d1b3f0c7b0 [fontcolor="#7AA2F7"; label="z"];
+    s18x55d1b3f0c7d0 [fontcolor="#7AA2F7"; label="y"];
+    s38x55d1b3f0c4b0 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0c4b0 [fontcolor="#7AA2F7"; label="y"];
+    s10x55d1b3f0c4c8 [fontname="Hack bold, monospace bold"; label="-"];
+    s18x55d1b3f0c2a0 [fontcolor="#7AA2F7"; label="y"];
+    s10x55d1b3f0c2c0 [fontcolor="#9ECE6A"; label="1"];
+    s38x55d1b3f0cc20 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0cc20 [fontcolor="#7AA2F7"; label="y"];
+    s10x55d1b3f0cc38 [fontcolor="#9ECE6A"; label="0"];
+    s38x55d1b3f0cc60 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x55d1b3f0cc60 [fontcolor="#7AA2F7"; label="output"];
+    s18x55d1b3f0cc78 [fontcolor="#7AA2F7"; label="z"];
+    s18x7ffcf2c6f150 -> s38x55d1b3f0cb60;
+    s38x55d1b3f0cb60 -> s18x55d1b3f0cb60;
+    s38x55d1b3f0cb60 -> s18x55d1b3f0cb78;
+    s18x7ffcf2c6f150 -> s38x55d1b3f0cba0;
+    s38x55d1b3f0cba0 -> s18x55d1b3f0cba0;
+    s38x55d1b3f0cba0 -> s10x55d1b3f0cbb8;
+    s18x7ffcf2c6f150 -> s08x55d1b3f0cbe0;
+    s08x55d1b3f0cbe0 -> s10x55d1b3f0c750;
+    s10x55d1b3f0c750 -> s18x55d1b3f0c500;
+    s10x55d1b3f0c750 -> s10x55d1b3f0c520;
+    s08x55d1b3f0cbe0 -> s18x55d1b3f0c768;
+    s18x55d1b3f0c768 -> s38x55d1b3f0c470;
+    s38x55d1b3f0c470 -> s18x55d1b3f0c470;
+    s38x55d1b3f0c470 -> s10x55d1b3f0c488;
+    s10x55d1b3f0c488 -> s18x55d1b3f0c7b0;
+    s10x55d1b3f0c488 -> s18x55d1b3f0c7d0;
+    s18x55d1b3f0c768 -> s38x55d1b3f0c4b0;
+    s38x55d1b3f0c4b0 -> s18x55d1b3f0c4b0;
+    s38x55d1b3f0c4b0 -> s10x55d1b3f0c4c8;
+    s10x55d1b3f0c4c8 -> s18x55d1b3f0c2a0;
+    s10x55d1b3f0c4c8 -> s10x55d1b3f0c2c0;
+    s18x7ffcf2c6f150 -> s38x55d1b3f0cc20;
+    s38x55d1b3f0cc20 -> s18x55d1b3f0cc20;
+    s38x55d1b3f0cc20 -> s10x55d1b3f0cc38;
+    s18x7ffcf2c6f150 -> s38x55d1b3f0cc60;
+    s38x55d1b3f0cc60 -> s18x55d1b3f0cc60;
+    s38x55d1b3f0cc60 -> s18x55d1b3f0cc78;
+}

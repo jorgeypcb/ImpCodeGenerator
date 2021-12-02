@@ -1,0 +1,124 @@
+digraph {
+    graph [
+        bgcolor="#24283B"
+        pad="0.5"
+        dpi=300]
+    node [
+        fontsize=12
+        fontcolor="#ffffff"
+        color="#E0AF68"
+        shape=underline
+        fontname="Hack, monospace"]
+    edge [
+        color="#E0AF68"
+        arrowsize=0.5]
+    s18x7ffd49b2bd20 [label="[list of commands]"];
+    s38x5590610750c0 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x5590610750c0 [fontcolor="#7AA2F7"; label="n"];
+    s18x5590610750d8 [fontcolor="#7AA2F7"; label="input"];
+    s38x559061075100 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075100 [fontcolor="#7AA2F7"; label="steps"];
+    s10x559061075118 [fontcolor="#9ECE6A"; label="0"];
+    s08x559061075140 [fontcolor="#BB9AF7"; label="while loop"];
+    s10x5590610759a0 [fontname="Hack bold, monospace bold"; label=">"];
+    s18x559061075bb0 [fontcolor="#7AA2F7"; label="n"];
+    s10x559061075bd0 [fontcolor="#9ECE6A"; label="1"];
+    s18x5590610759b8 [label="[list of commands]"];
+    s38x559061075a00 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075a00 [fontcolor="#7AA2F7"; label="rem"];
+    s18x559061075a18 [fontcolor="#7AA2F7"; label="n"];
+    s38x559061075a40 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075a40 [fontcolor="#7AA2F7"; label="quot"];
+    s10x559061075a58 [fontcolor="#9ECE6A"; label="0"];
+    s08x559061075a80 [fontcolor="#BB9AF7"; label="while loop"];
+    s10x559061075b50 [fontname="Hack bold, monospace bold"; label=">"];
+    s18x559061074f80 [fontcolor="#7AA2F7"; label="rem"];
+    s10x559061074fa0 [fontcolor="#9ECE6A"; label="1"];
+    s18x559061075b68 [label="[list of commands]"];
+    s38x559061074ef0 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061074ef0 [fontcolor="#7AA2F7"; label="rem"];
+    s10x559061074f08 [fontname="Hack bold, monospace bold"; label="-"];
+    s18x559061075230 [fontcolor="#7AA2F7"; label="rem"];
+    s10x559061075250 [fontcolor="#9ECE6A"; label="2"];
+    s38x559061074f30 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061074f30 [fontcolor="#7AA2F7"; label="quot"];
+    s10x559061074f48 [fontname="Hack bold, monospace bold"; label="+"];
+    s18x559061074c40 [fontcolor="#7AA2F7"; label="quot"];
+    s10x559061074c60 [fontcolor="#9ECE6A"; label="1"];
+    s08x559061075ac0 [fontcolor="#BB9AF7"; label="conditional"];
+    s10x559061075370 [fontname="Hack bold, monospace bold"; label="="];
+    s18x559061075280 [fontcolor="#7AA2F7"; label="rem"];
+    s10x5590610752a0 [fontcolor="#9ECE6A"; label="0"];
+    s38x559061075388 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075388 [fontcolor="#7AA2F7"; label="n"];
+    s18x5590610753a0 [fontcolor="#7AA2F7"; label="quot"];
+    s38x5590610753c8 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x5590610753c8 [fontcolor="#7AA2F7"; label="n"];
+    s10x5590610753e0 [fontname="Hack bold, monospace bold"; label="*"];
+    s10x559061075460 [fontcolor="#9ECE6A"; label="3"];
+    s10x559061075480 [fontname="Hack bold, monospace bold"; label="+"];
+    s18x559061075410 [fontcolor="#7AA2F7"; label="n"];
+    s10x559061075430 [fontcolor="#9ECE6A"; label="1"];
+    s38x559061075b00 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075b00 [fontcolor="#7AA2F7"; label="steps"];
+    s10x559061075b18 [fontname="Hack bold, monospace bold"; label="+"];
+    s18x559061074ea0 [fontcolor="#7AA2F7"; label="steps"];
+    s10x559061074ec0 [fontcolor="#9ECE6A"; label="1"];
+    s38x559061075180 [fontname="Hack italic, monospace italic"; label="assignment"];
+    s18x559061075180 [fontcolor="#7AA2F7"; label="output"];
+    s18x559061075198 [fontcolor="#7AA2F7"; label="steps"];
+    s18x7ffd49b2bd20 -> s38x5590610750c0;
+    s38x5590610750c0 -> s18x5590610750c0;
+    s38x5590610750c0 -> s18x5590610750d8;
+    s18x7ffd49b2bd20 -> s38x559061075100;
+    s38x559061075100 -> s18x559061075100;
+    s38x559061075100 -> s10x559061075118;
+    s18x7ffd49b2bd20 -> s08x559061075140;
+    s08x559061075140 -> s10x5590610759a0;
+    s10x5590610759a0 -> s18x559061075bb0;
+    s10x5590610759a0 -> s10x559061075bd0;
+    s08x559061075140 -> s18x5590610759b8;
+    s18x5590610759b8 -> s38x559061075a00;
+    s38x559061075a00 -> s18x559061075a00;
+    s38x559061075a00 -> s18x559061075a18;
+    s18x5590610759b8 -> s38x559061075a40;
+    s38x559061075a40 -> s18x559061075a40;
+    s38x559061075a40 -> s10x559061075a58;
+    s18x5590610759b8 -> s08x559061075a80;
+    s08x559061075a80 -> s10x559061075b50;
+    s10x559061075b50 -> s18x559061074f80;
+    s10x559061075b50 -> s10x559061074fa0;
+    s08x559061075a80 -> s18x559061075b68;
+    s18x559061075b68 -> s38x559061074ef0;
+    s38x559061074ef0 -> s18x559061074ef0;
+    s38x559061074ef0 -> s10x559061074f08;
+    s10x559061074f08 -> s18x559061075230;
+    s10x559061074f08 -> s10x559061075250;
+    s18x559061075b68 -> s38x559061074f30;
+    s38x559061074f30 -> s18x559061074f30;
+    s38x559061074f30 -> s10x559061074f48;
+    s10x559061074f48 -> s18x559061074c40;
+    s10x559061074f48 -> s10x559061074c60;
+    s18x5590610759b8 -> s08x559061075ac0;
+    s08x559061075ac0 -> s10x559061075370;
+    s10x559061075370 -> s18x559061075280;
+    s10x559061075370 -> s10x5590610752a0;
+    s08x559061075ac0 -> s38x559061075388;
+    s38x559061075388 -> s18x559061075388;
+    s38x559061075388 -> s18x5590610753a0;
+    s08x559061075ac0 -> s38x5590610753c8;
+    s38x5590610753c8 -> s18x5590610753c8;
+    s38x5590610753c8 -> s10x5590610753e0;
+    s10x5590610753e0 -> s10x559061075460;
+    s10x5590610753e0 -> s10x559061075480;
+    s10x559061075480 -> s18x559061075410;
+    s10x559061075480 -> s10x559061075430;
+    s18x5590610759b8 -> s38x559061075b00;
+    s38x559061075b00 -> s18x559061075b00;
+    s38x559061075b00 -> s10x559061075b18;
+    s10x559061075b18 -> s18x559061074ea0;
+    s10x559061075b18 -> s10x559061074ec0;
+    s18x7ffd49b2bd20 -> s38x559061075180;
+    s38x559061075180 -> s18x559061075180;
+    s38x559061075180 -> s18x559061075198;
+}

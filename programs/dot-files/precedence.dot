@@ -1,0 +1,8 @@
+Unable to finish parsing program.
+Error beginning here: 
+
+if w := 2 then 
+	arithmeticworks := true;
+else
+	arithmeticworks := false;
+fi;
