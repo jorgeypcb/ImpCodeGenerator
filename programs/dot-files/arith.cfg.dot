@@ -17,11 +17,9 @@ digraph "arith.cfg" {
 	3 -> 6 [label=JumpIfZero]
 	4 -> 5 [label=""]
 	5 -> 3 [label=Jump]
-	5 -> 6 [label=""]
 	6 -> 7 [label=""]
 	7 -> 8 [label=else]
 	7 -> 9 [label=JumpIfZero]
 	8 -> 10 [label=Jump]
-	8 -> 9 [label=""]
 	9 -> 10 [label=""]
 }

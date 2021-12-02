@@ -24,12 +24,9 @@ digraph "collatz.cfg" {
 	6 -> 9 [label=JumpIfZero]
 	7 -> 8 [label=""]
 	8 -> 6 [label=Jump]
-	8 -> 9 [label=""]
 	9 -> 10 [label=else]
 	9 -> 11 [label=JumpIfZero]
 	10 -> 12 [label=Jump]
-	10 -> 11 [label=""]
 	11 -> 12 [label=""]
 	12 -> 3 [label=Jump]
-	12 -> 13 [label=""]
 }

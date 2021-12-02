@@ -14,6 +14,5 @@ digraph "factorial.cfg" {
 	3 -> 6 [label=JumpIfZero]
 	4 -> 5 [label=""]
 	5 -> 3 [label=Jump]
-	5 -> 6 [label=""]
 	6 -> 7 [label=""]
 }
