@@ -299,7 +299,9 @@ struct ir_compiler {
         compile(if_.when_true());
         // Jump to the end of the if statement after finishing the 'then' block
         size_t end_of_if_label_id = ins.size();
-        ins.push_back(instruction {Op::Jump, 0, 0, 0, expr_label});
+        // The else block and it's corresponding jump should be part of the
+        // previous expression
+        ins.push_back(instruction {Op::Jump, 0, 0, 0, expr_label - 1});
         // Add the label for the start of the else block, then compile the else
         // block
         ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
