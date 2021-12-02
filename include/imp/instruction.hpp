@@ -45,7 +45,8 @@ struct instruction {
     Op op {};   // Stores the operand
     long long i1 {};  // Used for input1 and the condition of a jump
     long long i2 {};  // Used for input2 and the location of a jump
-    int output; // Used as the destination of an instruction
+    int output {}; // Used as the destination of an instruction
+    int expr_label {};
 
     // Gets the category of an operation based on the operation
     constexpr OpCategory getCategory() const noexcept {
@@ -108,15 +109,94 @@ struct fmt::formatter<imp::instruction> {
 
     template <class Context>
     constexpr auto format(imp::instruction const& ins, Context& ctx) {
-        return format_python(ins, ctx);
+        return format_with_labels(ins, ctx);
     }
 
+    template <class Context>
+    constexpr auto format_with_labels(imp::instruction const& ins, Context& ctx)
+        -> decltype(ctx.out()) {
+        using imp::Op;
+        auto [op, i1, i2, out, expr_label] = ins;
+        auto op_name = imp::to_string(op);
+
+        // Operations in the same category get formatted in the same way
+        switch (op) {
+            case Op::Plus:
+            case Op::Minus:
+            case Op::Times:
+            case Op::Greater:
+            case Op::GreaterEq:
+            case Op::Equal:
+            case Op::Or:
+            case Op::And:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} {} {} {}",
+                    op_name,
+                    i1,
+                    i2,
+                    out,
+                    expr_label);
+            case Op::Not:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} null {} {}",
+                    op_name,
+                    i1,
+                    out,
+                    expr_label);
+            case Op::Move:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} null {} {}",
+                    op_name,
+                    i1,
+                    out,
+                    expr_label);
+            case Op::LoadConstant:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} null {} {}",
+                    op_name,
+                    i1,
+                    out,
+                    expr_label);
+            case Op::JumpIfZero:
+            case Op::JumpIfNonzero:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} {} .LBB_{} null {}",
+                    op_name,
+                    i1,
+                    i2,
+                    expr_label);
+            case Op::Label:
+            case Op::Jump:
+                return fmt::format_to(
+                    ctx.out(),
+                    "{} .LBB_{} null null {}",
+                    op_name,
+                    i1,
+                    expr_label);
+
+            // Used if given an unknown opcode
+            default:
+                return fmt::format_to(
+                    ctx.out(),
+                    "Op({}) {} {} {} {}",
+                    (int)op,
+                    i1,
+                    i2,
+                    out,
+                    expr_label);
+        }
+    }
     // Format requested by group
     template <class Context>
     constexpr auto format_python(imp::instruction const& ins, Context& ctx)
         -> decltype(ctx.out()) {
         using imp::Op;
-        auto [op, i1, i2, out] = ins;
+        auto [op, i1, i2, out, expr_label] = ins;
         auto op_name = imp::to_string(op);
 
         // Operations in the same category get formatted in the same way
@@ -170,7 +250,7 @@ struct fmt::formatter<imp::instruction> {
     constexpr auto format_alt(imp::instruction const& ins, Context& ctx)
         -> decltype(ctx.out()) {
         using imp::Op;
-        auto [op, i1, i2, out] = ins;
+        auto [op, i1, i2, out, expr_label] = ins;
         auto op_name = imp::to_string(op);
 
         // Operations in the same category get formatted in the same way
