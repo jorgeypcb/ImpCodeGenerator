@@ -108,7 +108,7 @@ struct ir_compiler {
     int skip_position = -1;
     // The value of the next lael
     int next_label = 0;
-    int expr_label = 0;
+    int expr_label = 1;
     // Gets an unused unique label number
     int get_next_label() { return next_label++; }
     std::vector<instruction> ins;
@@ -241,63 +241,73 @@ struct ir_compiler {
         expr_label++; // Get a new label after the command
     }
     void compile(while_loop<bool_expr, command> const& loop) {
-        int loop_condition = get_next_label();
-        int loop_body = get_next_label();
-        int loop_end = get_next_label();
+        // Add the label for the start of the condition
+        int loop_condition = expr_label;
+
         // Replace the skip position with the current loop condition. Save it to
         // 'previous_skip_position'. It'll be restored at the end of the
         // function
         int previous_skip_position = std::exchange(
             skip_position,
             loop_condition);
-
-        address_t cond_addr = get_address(loop.get_condition());
-
-        // Add the label for the start of the condition
         ins.push_back(
             instruction {Op::Label, loop_condition, 0, 0, expr_label});
+
         compile(loop.get_condition());
         // Jump to the end of the loop if the condition is false
-        ins.push_back(
-            instruction {Op::JumpIfZero, cond_addr, loop_end, 0, expr_label});
+
+        size_t loop_end_jump = ins.size();
+        ins.push_back(instruction {
+            Op::JumpIfZero,
+            get_address(loop.get_condition()),
+            0, // instruction::i2: This location will be filled in when the
+               // expression label for the end of the loop is known
+            0,
+            expr_label});
+
         expr_label++; // Get a new label after the condition
 
         // Compile the ody of the loop
         // First: Add a label indicating the start of the body
-        ins.push_back(instruction {Op::Label, loop_body, 0, 0, expr_label});
+        ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
         // Then compile the body of the loop itself
         compile(loop.get_body());
 
         // Jump back to the start of the loop
         ins.push_back(instruction {Op::Jump, loop_condition, 0, 0, expr_label});
         // Add a label for the instruction after the end of the loop
-        ins.push_back(instruction {Op::Label, loop_end, 0, 0, expr_label});
+        ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
+        // Update the loop end jump instruction to point to this label
+        ins[loop_end_jump].i2 = expr_label;
 
         // Restore the skip position
         skip_position = previous_skip_position;
     }
     void compile(if_command<bool_expr, command> const& if_) {
-        int else_label = get_next_label();
-        int end_of_if = get_next_label();
-
         address_t cond_addr = get_address(if_.get_condition());
 
         compile(if_.get_condition());
         // Jump to the else block if the condition was false
+        size_t else_label_id = ins.size();
         ins.push_back(
-            instruction {Op::JumpIfZero, cond_addr, else_label, 0, expr_label});
+            instruction {Op::JumpIfZero, cond_addr, 0, 0, expr_label});
         expr_label++; // Get a new label after the condition
 
         compile(if_.when_true());
         // Jump to the end of the if statement after finishing the 'then' block
-        ins.push_back(instruction {Op::Jump, end_of_if, 0, 0, expr_label});
+        size_t end_of_if_label_id = ins.size();
+        ins.push_back(instruction {Op::Jump, 0, 0, 0, expr_label});
         // Add the label for the start of the else block, then compile the else
         // block
-        ins.push_back(instruction {Op::Label, else_label, 0, 0, expr_label});
+        ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
+        // Update the label id now that the else expression is known
+        ins[else_label_id].i2 = expr_label;
         compile(if_.when_false());
 
         // Add a label for the instruction after the end of the if statement
-        ins.push_back(instruction {Op::Label, end_of_if, 0, 0, expr_label});
+        ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
+        // Update the label id for the jump block at the end of the if
+        ins[end_of_if_label_id].i1 = expr_label;
     }
     void compile(std::vector<command> const& commands) {
         for (command const& c : commands) {
