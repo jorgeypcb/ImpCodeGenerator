@@ -108,6 +108,7 @@ struct ir_compiler {
     int skip_position = -1;
     // The value of the next lael
     int next_label = 0;
+    int expr_label = 0;
     // Gets an unused unique label number
     int get_next_label() { return next_label++; }
     std::vector<instruction> ins;
@@ -115,10 +116,12 @@ struct ir_compiler {
     // No-op - does nothing
     void compile(variable const& v) {}
     void compile(constant const& c) {
-        ins.push_back(instruction {Op::LoadConstant, c.value, 0, c.address});
+        ins.push_back(
+            instruction {Op::LoadConstant, c.value, 0, c.address, expr_label});
     }
     void compile(bool_const const& c) {
-        ins.push_back(instruction {Op::LoadConstant, c.value, 0, c.address});
+        ins.push_back(
+            instruction {Op::LoadConstant, c.value, 0, c.address, expr_label});
     }
     void compile(binary_expr<arith_expr> const& b) {
         compile(b.get_left());
@@ -130,28 +133,32 @@ struct ir_compiler {
                     Op::Plus,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case '-':
                 i = {
                     Op::Minus,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case '*':
                 i = {
                     Op::Times,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case '=':
                 i = {
                     Op::Equal,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case '<':
                 i = {
@@ -159,14 +166,16 @@ struct ir_compiler {
                     // Flip operands: right first
                     get_address(b.get_right()),
                     get_address(b.get_left()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case '>':
                 i = {
                     Op::Greater,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case 'L':
                 i = {
@@ -174,22 +183,28 @@ struct ir_compiler {
                     // flip operands: right first
                     get_address(b.get_right()),
                     get_address(b.get_left()),
-                    b.address};
+                    b.address,
+                    expr_label};
                 break;
             case 'G':
                 i = {
                     Op::GreaterEq,
                     get_address(b.get_left()),
                     get_address(b.get_right()),
-                    b.address};
+                    b.address,
+                    expr_label};
         }
         ins.push_back(i);
     }
     void compile(unary_expr<bool_expr> const& b) {
         compile(b.get_input());
         // The only one right now is not, so I didn't bother writing a switch
-        ins.push_back(
-            instruction {Op::Not, get_address(b.get_input()), 0, b.address});
+        ins.push_back(instruction {
+            Op::Not,
+            get_address(b.get_input()),
+            0,
+            b.address,
+            expr_label});
     }
     void compile(binary_expr<bool_expr> const& b) {
         compile(b.get_left());
@@ -203,7 +218,8 @@ struct ir_compiler {
             op,
             get_address(b.get_left()),
             get_address(b.get_right()),
-            b.address});
+            b.address,
+            expr_label});
     }
     void compile(assignment<arith_expr> const& ass) {
         compile(ass.value);
@@ -213,13 +229,14 @@ struct ir_compiler {
             Op::Move,
             get_address(ass.value),
             0,
-            ass.dest.address});
+            ass.dest.address,
+            expr_label});
     }
     void compile(skip_command const& cmd) {
         // Jump to the location set for a skip
         // This should be the condition of a loop, because it skips everything
         // else in the body
-        ins.push_back(instruction {Op::Jump, skip_position, 0, 0});
+        ins.push_back(instruction {Op::Jump, skip_position, 0, 0, expr_label});
     }
     void compile(while_loop<bool_expr, command> const& loop) {
         int loop_condition = get_next_label();
@@ -235,21 +252,23 @@ struct ir_compiler {
         address_t cond_addr = get_address(loop.get_condition());
 
         // Add the label for the start of the condition
-        ins.push_back(instruction {Op::Label, loop_condition, 0, 0});
+        ins.push_back(
+            instruction {Op::Label, loop_condition, 0, 0, expr_label});
         compile(loop.get_condition());
         // Jump to the end of the loop if the condition is false
-        ins.push_back(instruction {Op::JumpIfZero, cond_addr, loop_end, 0});
+        ins.push_back(
+            instruction {Op::JumpIfZero, cond_addr, loop_end, 0, expr_label});
 
         // Compile the ody of the loop
         // First: Add a label indicating the start of the body
-        ins.push_back(instruction {Op::Label, loop_body, 0, 0});
+        ins.push_back(instruction {Op::Label, loop_body, 0, 0, expr_label});
         // Then compile the body of the loop itself
         compile(loop.get_body());
 
         // Jump back to the start of the loop
-        ins.push_back(instruction {Op::Jump, loop_condition, 0, 0});
+        ins.push_back(instruction {Op::Jump, loop_condition, 0, 0, expr_label});
         // Add a label for the instruction after the end of the loop
-        ins.push_back(instruction {Op::Label, loop_end, 0, 0});
+        ins.push_back(instruction {Op::Label, loop_end, 0, 0, expr_label});
 
         // Restore the skip position
         skip_position = previous_skip_position;
@@ -262,17 +281,18 @@ struct ir_compiler {
 
         compile(if_.get_condition());
         // Jump to the else block if the condition was false
-        ins.push_back(instruction {Op::JumpIfZero, cond_addr, else_label, 0});
+        ins.push_back(
+            instruction {Op::JumpIfZero, cond_addr, else_label, 0, expr_label});
         compile(if_.when_true());
         // Jump to the end of the if statement after finishing the 'then' block
-        ins.push_back(instruction {Op::Jump, end_of_if, 0, 0});
+        ins.push_back(instruction {Op::Jump, end_of_if, 0, 0, expr_label});
         // Add the label for the start of the else block, then compile the else
         // block
-        ins.push_back(instruction {Op::Label, else_label, 0, 0});
+        ins.push_back(instruction {Op::Label, else_label, 0, 0, expr_label});
         compile(if_.when_false());
 
         // Add a label for the instruction after the end of the if statement
-        ins.push_back(instruction {Op::Label, end_of_if, 0, 0});
+        ins.push_back(instruction {Op::Label, end_of_if, 0, 0, expr_label});
     }
     void compile(std::vector<command> const& commands) {
         for (command const& c : commands) {
