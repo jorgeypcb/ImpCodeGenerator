@@ -3,20 +3,20 @@ compute Collatz
 input number is "input"                                     
 output is the number of steps, in "output"                  
 -}                                                          
-n := input;                                                 -- 1
-steps := 0;                                                 -- 2
-while n > 1 do                                              -- 3
-  rem := n; --Here we divide n by 2:                        -- 4
-  quot := 0;                                                -- 5
-  while rem > 1 do                                          -- 6
-    rem := rem - 2;                                         -- 7
-    quot := quot + 1                                        -- 8
-  od;                                                       -- 
-  if rem = 0 then                                           -- 9
-    n := quot                                               -- 10
-  else                                                      -- 
-    n := 3*n+1                                              -- 11
-  fi;                                                       -- 
-  steps := steps + 1                                        -- 12
-od;                                                         -- 
-output := steps                                             -- 13
+n := input;                            -- 1
+steps := 0;                            -- 2
+while n > 1 do                         -- 3
+  rem := n; --Here we divide n by 2:   -- 4
+  quot := 0;                           -- 5
+  while rem > 1 do                     -- 6
+    rem := rem - 2;                    -- 7
+    quot := quot + 1                   -- 8
+  od;                                  -- 
+  if rem = 0 then                      -- 9
+    n := quot                          -- 10
+  else                                 -- 
+    n := 3*n+1                         -- 11
+  fi;                                  -- 
+  steps := steps + 1                   -- 12
+od;                                    -- 
+output := steps                        -- 13
