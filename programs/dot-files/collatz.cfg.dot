@@ -1,0 +1,35 @@
+digraph "collatz.cfg" {
+	graph [bgcolor="#24283B" pad=0.5]
+	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=8]
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	12
+	1 -> 2 [label=""]
+	2 -> 3 [label=""]
+	3 -> 4 [label=else]
+	3 -> 13 [label=JumpIfZero]
+	4 -> 5 [label=""]
+	5 -> 6 [label=""]
+	6 -> 7 [label=else]
+	6 -> 9 [label=JumpIfZero]
+	7 -> 8 [label=""]
+	8 -> 6 [label=Jump]
+	8 -> 9 [label=""]
+	9 -> 10 [label=else]
+	9 -> 11 [label=JumpIfZero]
+	10 -> 12 [label=Jump]
+	10 -> 11 [label=""]
+	11 -> 12 [label=""]
+	12 -> 3 [label=Jump]
+	12 -> 13 [label=""]
+}
