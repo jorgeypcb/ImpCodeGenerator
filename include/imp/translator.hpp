@@ -273,9 +273,10 @@ struct ir_compiler {
         // Then compile the body of the loop itself
         compile(loop.get_body());
 
-        // Jump back to the start of the loop
+        // Jump back to the start of the loop. This should be part of the
+        // previous expression, hence, expr_label - 1
         ins.push_back(
-            instruction {Op::Jump, loop_condition, 0, 0, loop_condition});
+            instruction {Op::Jump, loop_condition, 0, 0, expr_label - 1});
 
         // Add a label for the instruction after the end of the loop
         ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
@@ -298,7 +299,7 @@ struct ir_compiler {
         compile(if_.when_true());
         // Jump to the end of the if statement after finishing the 'then' block
         size_t end_of_if_label_id = ins.size();
-        ins.push_back(instruction {Op::Jump, 0, 0, 0, 0});
+        ins.push_back(instruction {Op::Jump, 0, 0, 0, expr_label});
         // Add the label for the start of the else block, then compile the else
         // block
         ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
@@ -310,7 +311,6 @@ struct ir_compiler {
         ins.push_back(instruction {Op::Label, expr_label, 0, 0, expr_label});
         // Update the label id for the jump block at the end of the if
         ins[end_of_if_label_id].i1 = expr_label;
-        ins[end_of_if_label_id].expr_label = expr_label;
     }
     void compile(std::vector<command> const& commands) {
         for (command const& c : commands) {
