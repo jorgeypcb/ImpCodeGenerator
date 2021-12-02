@@ -10,7 +10,7 @@ digraph "factorial.cfg" {
 	6
 	1 -> 2 [label=""]
 	2 -> 3 [label=""]
-	3 -> 4 [label=""]
+	3 -> 4 [label=else]
 	3 -> 6 [label=JumpIfZero]
 	4 -> 5 [label=""]
 	5 -> 3 [label=Jump]
