@@ -231,12 +231,14 @@ struct ir_compiler {
             0,
             ass.dest.address,
             expr_label});
+        expr_label++; // Get a new label after the command
     }
     void compile(skip_command const& cmd) {
         // Jump to the location set for a skip
         // This should be the condition of a loop, because it skips everything
         // else in the body
         ins.push_back(instruction {Op::Jump, skip_position, 0, 0, expr_label});
+        expr_label++; // Get a new label after the command
     }
     void compile(while_loop<bool_expr, command> const& loop) {
         int loop_condition = get_next_label();
@@ -258,6 +260,7 @@ struct ir_compiler {
         // Jump to the end of the loop if the condition is false
         ins.push_back(
             instruction {Op::JumpIfZero, cond_addr, loop_end, 0, expr_label});
+        expr_label++; // Get a new label after the condition
 
         // Compile the ody of the loop
         // First: Add a label indicating the start of the body
@@ -283,6 +286,8 @@ struct ir_compiler {
         // Jump to the else block if the condition was false
         ins.push_back(
             instruction {Op::JumpIfZero, cond_addr, else_label, 0, expr_label});
+        expr_label++; // Get a new label after the condition
+
         compile(if_.when_true());
         // Jump to the end of the if statement after finishing the 'then' block
         ins.push_back(instruction {Op::Jump, end_of_if, 0, 0, expr_label});
