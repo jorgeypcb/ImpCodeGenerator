@@ -1,0 +1,11 @@
+a := 0;
+b := 1;
+z := 0;
+while n > z do
+  t := a + b;
+  a := b;
+  b := t;
+  n := n - 1;
+  z := 0;
+od;
+output := a;
