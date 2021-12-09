@@ -100,6 +100,14 @@ struct address_assigner {
         }
         assign_address(program, addr);
     }
+
+    void print_variables(FILE* file) {
+        address_t addr = 0;
+        for (std::string_view var_name : variables) {
+            fmt::print(file, "{} {}\n", addr, var_name);
+            addr++;
+        }
+    }
 };
 
 struct ir_compiler {
@@ -324,15 +332,21 @@ struct ir_compiler {
         rva::visit([this](auto const& expr) { compile(expr); }, v);
     }
     // Step 3: Translate to Intermediate Representation
-    void print(command cmd) {
+    void print(
+        command cmd,
+        FILE* instruction_file = stdout,
+        FILE* variable_file = stderr) {
         address_assigner scope;
         // Give everything an address
         scope.assign_address(cmd);
 
+        // Print all the variables to the variable file
+        scope.print_variables(variable_file);
+
         // Compile the command into the instruction vector
         compile(cmd);
         for (instruction const& i : ins) {
-            fmt::print("{}\n", i);
+            fmt::print(instruction_file, "{}\n", i);
         }
     }
 };
