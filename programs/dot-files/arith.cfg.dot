@@ -1,25 +1,93 @@
 digraph "arith.cfg" {
 	graph [bgcolor="#24283B" pad=0.5]
 	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
-	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=8]
-	1
-	2
-	3
-	4
-	5
-	6
-	7
-	8
-	9
-	1 -> 2 [label=""]
-	2 -> 3 [label=""]
-	3 -> 4 [label=else]
-	3 -> 6 [label=JumpIfZero]
-	4 -> 5 [label=""]
-	5 -> 3 [label=Jump]
-	6 -> 7 [label=""]
-	7 -> 8 [label=else]
-	7 -> 9 [label=JumpIfZero]
-	8 -> 10 [label=Jump]
-	9 -> 10 [label=""]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=12]
+	"---2---
+Gen {}
+Kill set(['x'])"
+	"---6---
+Gen set(['x', 'counter'])
+Kill set(['y'])"
+	"---4---
+Gen set(['counter'])
+Kill set(['x'])"
+	"---3---
+Gen set(['counter'])
+Kill {}"
+	"---3---
+Gen set(['counter'])
+Kill {}"
+	"---5---
+Gen set(['x'])
+Kill set(['counter'])"
+	"---9---
+Gen {}
+Kill set(['z'])"
+	"---8---
+Gen set(['y'])
+Kill set(['z'])"
+	"---7---
+Gen set(['y'])
+Kill {}"
+	"---10---
+Gen set(['z'])
+Kill set(['output'])"
+	"---10---
+Gen set(['z'])
+Kill set(['output'])"
+	"---1---
+Gen {}
+Kill set(['counter'])" -> "---2---
+Gen {}
+Kill set(['x'])" [label=""]
+	"---3---
+Gen set(['counter'])
+Kill {}" -> "---6---
+Gen set(['x', 'counter'])
+Kill set(['y'])" [label=" if "]
+	"---3---
+Gen set(['counter'])
+Kill {}" -> "---4---
+Gen set(['counter'])
+Kill set(['x'])" [label=" else "]
+	"---2---
+Gen {}
+Kill set(['x'])" -> "---3---
+Gen set(['counter'])
+Kill {}" [label=""]
+	"---5---
+Gen set(['x'])
+Kill set(['counter'])" -> "---3---
+Gen set(['counter'])
+Kill {}" [label=" j "]
+	"---4---
+Gen set(['counter'])
+Kill set(['x'])" -> "---5---
+Gen set(['x'])
+Kill set(['counter'])" [label=""]
+	"---7---
+Gen set(['y'])
+Kill {}" -> "---9---
+Gen {}
+Kill set(['z'])" [label=" if "]
+	"---7---
+Gen set(['y'])
+Kill {}" -> "---8---
+Gen set(['y'])
+Kill set(['z'])" [label=" else "]
+	"---6---
+Gen set(['x', 'counter'])
+Kill set(['y'])" -> "---7---
+Gen set(['y'])
+Kill {}" [label=""]
+	"---9---
+Gen {}
+Kill set(['z'])" -> "---10---
+Gen set(['z'])
+Kill set(['output'])" [label=""]
+	"---8---
+Gen set(['y'])
+Kill set(['z'])" -> "---10---
+Gen set(['z'])
+Kill set(['output'])" [label=" j "]
 }

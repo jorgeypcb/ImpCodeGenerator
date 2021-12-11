@@ -1,12 +1,15 @@
+import copy
+from il_utils import*
+
 def cleanup(instructions_=None,**kwargs):
     if instructions_ is None:return kwargs['init_instr']
     instructions=copy.deepcopy(instructions_)
     varmap=kwargs['varmap']
     instructions=compress_constant_assignments(instructions,varmap)
-    instructions=remove_unused_assignments(instructions,varmap)
+    instructions=remove_unused_temporary_assignments(instructions,varmap)
     return instructions
   
-def compress_constant_assignments_in_block(instructions,varmap):
+def compress_constant_assignments(instructions,varmap):
     delete=[]
     for ni,i in enumerate(instructions[:-1]):
         next_i=instructions[ni+1]
@@ -16,7 +19,7 @@ def compress_constant_assignments_in_block(instructions,varmap):
                 if output(i) not in list(varmap): delete.append(ni)
     return [instructions[i] for i in range(len(instructions)) if i not in delete]
 
-def remove_unused_assignments(instructions,varmap):
+def remove_unused_temporary_assignments(instructions,varmap):
     def keep(idx):
         ins=instructions[:idx]+instructions[idx+1:]
         return output(instructions[idx]) in [i0(i) for i in ins]+list(varmap)

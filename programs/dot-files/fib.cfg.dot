@@ -1,0 +1,85 @@
+digraph "fib.cfg" {
+	graph [bgcolor="#24283B" pad=0.5]
+	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=12]
+	"---2---
+Gen {}
+Kill set(['b'])"
+	"---4---
+Gen set(['z', 'n'])
+Kill {}"
+	"---3---
+Gen {}
+Kill set(['z'])"
+	"---6---
+Gen set(['b'])
+Kill set(['a'])"
+	"---10---
+Gen set(['a'])
+Kill set(['output'])"
+	"---5---
+Gen set(['a', 'b'])
+Kill set(['t'])"
+	"---8---
+Gen set(['n'])
+Kill set(['n'])"
+	"---7---
+Gen set(['t'])
+Kill set(['b'])"
+	"---4---
+Gen set(['z', 'n'])
+Kill {}"
+	"---9---
+Gen {}
+Kill set(['z'])"
+	"---1---
+Gen {}
+Kill set(['a'])" -> "---2---
+Gen {}
+Kill set(['b'])" [label=""]
+	"---3---
+Gen {}
+Kill set(['z'])" -> "---4---
+Gen set(['z', 'n'])
+Kill {}" [label=""]
+	"---2---
+Gen {}
+Kill set(['b'])" -> "---3---
+Gen {}
+Kill set(['z'])" [label=""]
+	"---5---
+Gen set(['a', 'b'])
+Kill set(['t'])" -> "---6---
+Gen set(['b'])
+Kill set(['a'])" [label=""]
+	"---4---
+Gen set(['z', 'n'])
+Kill {}" -> "---10---
+Gen set(['a'])
+Kill set(['output'])" [label=" if "]
+	"---4---
+Gen set(['z', 'n'])
+Kill {}" -> "---5---
+Gen set(['a', 'b'])
+Kill set(['t'])" [label=" else "]
+	"---7---
+Gen set(['t'])
+Kill set(['b'])" -> "---8---
+Gen set(['n'])
+Kill set(['n'])" [label=""]
+	"---6---
+Gen set(['b'])
+Kill set(['a'])" -> "---7---
+Gen set(['t'])
+Kill set(['b'])" [label=""]
+	"---9---
+Gen {}
+Kill set(['z'])" -> "---4---
+Gen set(['z', 'n'])
+Kill {}" [label=" j "]
+	"---8---
+Gen set(['n'])
+Kill set(['n'])" -> "---9---
+Gen {}
+Kill set(['z'])" [label=""]
+}

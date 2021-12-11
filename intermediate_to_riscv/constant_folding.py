@@ -1,3 +1,6 @@
+import copy
+from il_utils import*
+
 plus=lambda a,b: int(a)+int(b)
 minus=lambda a,b: int(a)-int(b)
 times=lambda a,b: int(a)*int(b)
@@ -41,11 +44,11 @@ def fold(instructions_=None,**kwargs):
             if op(i) in binary_arithmetic_functions: 
                 if t0 and t1:
 #                     print('\nconstconst\n')
-                    return fold_const_const(instructions,[t0[1],t1[1],op_instruction],delete=True)
+                    return fold_const_const(instructions,[t0[1],t1[1],op_instruction])
                 if (t0 and v1_foldable):
-                    return fold_var_const(instructions,[t0[1],op_instruction],foldval[v1][0],delete=True)
+                    return fold_var_const(instructions,[t0[1],op_instruction],foldval[v1][0])
                 if (v0_foldable and t1):
-                    return fold_var_const(instructions,[t1[1],op_instruction],foldval[v0][0],delete=True)
+                    return fold_var_const(instructions,[t1[1],op_instruction],foldval[v0][0])
                 if (v0_foldable and v1_foldable):
                     return fold_var_var(instructions,op_instruction,stackmap[v0],foldval[v0][0],stackmap[v1],foldval[v1][0])
     return instructions
@@ -73,6 +76,7 @@ def fold_var_const(instructions,lines,varval,delete=False):
     instructions[lines[-1]]=new_ins
 #     print(new_ins)
 #     print(instructions[lines[-1]])
+    #ELIMINATE DEAD CODE WHILE FOLDING
     if delete: return [instructions[i] for i in range(len(instructions)) if i not in (lines[:-1])]
     return instructions
 
@@ -111,5 +115,6 @@ def fold_const_const(instructions,lines,delete=False):
 #     print(new_ins)
 #     print(instructions[lines[-1]])
 #     print(instructions,'****\n')
+    #ELIMINATE DEAD CODE WHILE FOLDING
     if delete: return[instructions[i] for i in range(len(instructions)) if i not in lines[:-1]]
     return instructions

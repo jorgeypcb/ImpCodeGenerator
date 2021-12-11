@@ -1,0 +1,21 @@
+digraph "dead-code-test-1.cfg" {
+	graph [bgcolor="#24283B" pad=0.5]
+	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=12]
+	"---2---
+Gen {}
+Kill set(['y'])"
+	"---3---
+Gen set(['y', 'x'])
+Kill set(['output'])"
+	"---1---
+Gen {}
+Kill set(['x'])" -> "---2---
+Gen {}
+Kill set(['y'])" [label=""]
+	"---2---
+Gen {}
+Kill set(['y'])" -> "---3---
+Gen set(['y', 'x'])
+Kill set(['output'])" [label=""]
+}

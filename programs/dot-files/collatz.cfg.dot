@@ -1,32 +1,125 @@
 digraph "collatz.cfg" {
 	graph [bgcolor="#24283B" pad=0.5]
 	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
-	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=8]
-	1
-	2
-	3
-	4
-	5
-	6
-	7
-	8
-	9
-	10
-	11
-	12
-	1 -> 2 [label=""]
-	2 -> 3 [label=""]
-	3 -> 4 [label=else]
-	3 -> 13 [label=JumpIfZero]
-	4 -> 5 [label=""]
-	5 -> 6 [label=""]
-	6 -> 7 [label=else]
-	6 -> 9 [label=JumpIfZero]
-	7 -> 8 [label=""]
-	8 -> 6 [label=Jump]
-	9 -> 10 [label=else]
-	9 -> 11 [label=JumpIfZero]
-	10 -> 12 [label=Jump]
-	11 -> 12 [label=""]
-	12 -> 3 [label=Jump]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=12]
+	"---12---
+Gen set(['steps'])
+Kill set(['steps'])"
+	"---12---
+Gen set(['steps'])
+Kill set(['steps'])"
+	"---3---
+Gen set(['n'])
+Kill {}"
+	"---2---
+Gen {}
+Kill set(['steps'])"
+	"---13---
+Gen set(['steps'])
+Kill set(['output'])"
+	"---4---
+Gen set(['n'])
+Kill set(['rem'])"
+	"---3---
+Gen set(['n'])
+Kill {}"
+	"---6---
+Gen set(['rem'])
+Kill {}"
+	"---5---
+Gen {}
+Kill set(['quot'])"
+	"---8---
+Gen set(['quot'])
+Kill set(['quot'])"
+	"---9---
+Gen set(['rem'])
+Kill {}"
+	"---7---
+Gen set(['rem'])
+Kill set(['rem'])"
+	"---11---
+Gen set(['n'])
+Kill set(['n'])"
+	"---10---
+Gen set(['quot'])
+Kill set(['n'])"
+	"---6---
+Gen set(['rem'])
+Kill {}"
+	"---11---
+Gen set(['n'])
+Kill set(['n'])" -> "---12---
+Gen set(['steps'])
+Kill set(['steps'])" [label=""]
+	"---10---
+Gen set(['quot'])
+Kill set(['n'])" -> "---12---
+Gen set(['steps'])
+Kill set(['steps'])" [label=" j "]
+	"---12---
+Gen set(['steps'])
+Kill set(['steps'])" -> "---3---
+Gen set(['n'])
+Kill {}" [label=" j "]
+	"---1---
+Gen set(['input'])
+Kill set(['n'])" -> "---2---
+Gen {}
+Kill set(['steps'])" [label=""]
+	"---3---
+Gen set(['n'])
+Kill {}" -> "---13---
+Gen set(['steps'])
+Kill set(['output'])" [label=" if "]
+	"---3---
+Gen set(['n'])
+Kill {}" -> "---4---
+Gen set(['n'])
+Kill set(['rem'])" [label=" else "]
+	"---2---
+Gen {}
+Kill set(['steps'])" -> "---3---
+Gen set(['n'])
+Kill {}" [label=""]
+	"---5---
+Gen {}
+Kill set(['quot'])" -> "---6---
+Gen set(['rem'])
+Kill {}" [label=""]
+	"---4---
+Gen set(['n'])
+Kill set(['rem'])" -> "---5---
+Gen {}
+Kill set(['quot'])" [label=""]
+	"---7---
+Gen set(['rem'])
+Kill set(['rem'])" -> "---8---
+Gen set(['quot'])
+Kill set(['quot'])" [label=""]
+	"---6---
+Gen set(['rem'])
+Kill {}" -> "---9---
+Gen set(['rem'])
+Kill {}" [label=" if "]
+	"---6---
+Gen set(['rem'])
+Kill {}" -> "---7---
+Gen set(['rem'])
+Kill set(['rem'])" [label=" else "]
+	"---9---
+Gen set(['rem'])
+Kill {}" -> "---11---
+Gen set(['n'])
+Kill set(['n'])" [label=" if "]
+	"---9---
+Gen set(['rem'])
+Kill {}" -> "---10---
+Gen set(['quot'])
+Kill set(['n'])" [label=" else "]
+	"---8---
+Gen set(['quot'])
+Kill set(['quot'])" -> "---6---
+Gen set(['rem'])
+Kill {}" [label=" j "]
 }

@@ -1,18 +1,61 @@
 digraph "factorial.cfg" {
 	graph [bgcolor="#24283B" pad=0.5]
 	node [color="#E0AF68" fontcolor="#ffffff" fontname="Hack, monospace" fontsize=12 shape=underline]
-	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=8]
-	1
-	2
-	3
-	4
-	5
-	6
-	1 -> 2 [label=""]
-	2 -> 3 [label=""]
-	3 -> 4 [label=else]
-	3 -> 6 [label=JumpIfZero]
-	4 -> 5 [label=""]
-	5 -> 3 [label=Jump]
-	6 -> 7 [label=""]
+	edge [arrowsize=0.5 color="#E0AF68" fontcolor="#ffffff" fontsize=12]
+	"---2---
+Gen {}
+Kill set(['z'])"
+	"---6---
+Gen {}
+Kill set(['y'])"
+	"---4---
+Gen set(['y', 'z'])
+Kill set(['z'])"
+	"---3---
+Gen set(['y'])
+Kill {}"
+	"---3---
+Gen set(['y'])
+Kill {}"
+	"---5---
+Gen set(['y'])
+Kill set(['y'])"
+	"---7---
+Gen set(['z'])
+Kill set(['output'])"
+	"---1---
+Gen set(['x'])
+Kill set(['y'])" -> "---2---
+Gen {}
+Kill set(['z'])" [label=""]
+	"---3---
+Gen set(['y'])
+Kill {}" -> "---6---
+Gen {}
+Kill set(['y'])" [label=" if "]
+	"---3---
+Gen set(['y'])
+Kill {}" -> "---4---
+Gen set(['y', 'z'])
+Kill set(['z'])" [label=" else "]
+	"---2---
+Gen {}
+Kill set(['z'])" -> "---3---
+Gen set(['y'])
+Kill {}" [label=""]
+	"---5---
+Gen set(['y'])
+Kill set(['y'])" -> "---3---
+Gen set(['y'])
+Kill {}" [label=" j "]
+	"---4---
+Gen set(['y', 'z'])
+Kill set(['z'])" -> "---5---
+Gen set(['y'])
+Kill set(['y'])" [label=""]
+	"---6---
+Gen {}
+Kill set(['y'])" -> "---7---
+Gen set(['z'])
+Kill set(['output'])" [label=""]
 }

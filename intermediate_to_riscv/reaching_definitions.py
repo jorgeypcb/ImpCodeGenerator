@@ -1,3 +1,4 @@
+import copy
 def iterate_reaching_definitions(init_data=None,**kwargs):
     cfg=kwargs['cfg']
     data=copy.deepcopy(init_data)
