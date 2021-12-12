@@ -68,7 +68,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             else:
                 current_register = f"s{register_numb(var)}"
                 save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
-                return save_register
+                return ""
 
         def check_variable2(var):
             register_numb = lambda i: str(int(i) + 1)
@@ -76,18 +76,16 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 return load_stack(var, 'a2')
             else:
                 save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
-                return save_register
+                return ""
 
-        def check_binary_op(var, operator):
-            register1_numb = lambda i: str(int(i) + 1)
-            register2_numb = lambda i: str(int(i) + 2)
-            register3_numb = lambda i: str(int(i) + 3)
+        def check_binary_op(var, var1, output, operator):
+            register_numb = lambda i: str(int(i) + 1)
             if int(var) > 10:
                 return binaryop('a1', 'a1', 'a2', operator)
             else:
-                return binaryop(f"s{register3_numb(var)}",
-                                f"s{register1_numb(var)}",
-                                f"s{register2_numb(var)}",
+                return binaryop(f"s{register_numb(output)}",
+                                f"s{register_numb(var)}",
+                                f"s{register_numb(var1)}",
                                 operator)
 
         def check_unary_opGE(var, operator):
@@ -149,26 +147,33 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 return unaryop('a1', var, operator)
             else:
                 return unaryop(f"s{register1_numb(var)}", var, operator)
+            
+        def check_unary_opJump(var, var1, operator):
+            register1_numb = lambda i: str(int(i) + 1)
+            if int(var) > 10:
+                return unaryop('a1', var1, operator)
+            else:
+                return unaryop(f"s{register1_numb(var)}", f"{var1}", operator)
 
         def store_output(var):
             register_numb = lambda i: str(int(i) + 1)
             if int(var) > 10:
                 return save_stack(var, 'a1')
             else:
-                save_register = f"SD s{register_numb(var)} {stack(var)}\n\t"
-                return save_register
+                #save_register = f"SD s{register_numb(var)} {stack(var)}\n\t"
+                return ""
 
         if op in binaryops:
             riscv = ''.join([
                 check_variable1(i0),
                 check_variable2(i1),
-                check_binary_op(i0, binaryops[op]),
+                check_binary_op(i0, i1, output, binaryops[op]),
                 store_output(output)
             ])
 
         elif op in jumpops:
             riscv = ''.join(
-                [check_variable1(i0), unaryop('a1', i1, jumpops[op])])
+                [check_variable1(i0), check_unary_opJump(i0, i1, jumpops[op])])
 
         elif op == 'GreaterEq':
             #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
@@ -370,3 +375,5 @@ Options:
 
 if __name__ == '__main__':
     process_args(sys.argv)
+
+
