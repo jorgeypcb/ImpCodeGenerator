@@ -45,11 +45,11 @@ def print_riscv_instruction(instruction,register_allocation=False):
     binaryops = {'Plus':'ADD','Minus':'SUB','Times':'MUL','Greater':'SGT','And':'AND','Or':'OR'}
     jumpops = {'JumpIfZero':'BEQZ','JumpIfNonzero':'BNEZ'}
 
-    stack = lambda i : str(8*int(i)) + '(a0)' #converts stack index 
-    load_stack = lambda i, a: "LD "+a+", "+ stack(i) + "\n\t"  #load ith value from stack to register a
-    save_stack = lambda i, a: "SD "+a+", "+ stack(i) + "\n\t"  #save register a to ith index in stack
-    binaryop = lambda out_reg, ai, aj, opname: opname + " " + out_reg + ", " + ai +", " + aj + "\n\t" #perform operation a1 op a2, put result in output register
-    unaryop = lambda arg1, arg2, opname: opname + " " + arg1 + ", " + arg2 + '\n\t'
+    stack = lambda i : f"{8*int(i)}(a0)" #converts stack index 
+    load_stack = lambda i, a: f"LD {a}, {stack(i)}\n\t"  #load ith value from stack to register a
+    save_stack = lambda i, a: f"SD {a}, {stack(i)}\n\t"  #save register a to ith index in stack
+    binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}\n\t" #perform operation a1 op a2, put result in output register
+    unaryop = lambda arg1, arg2, opname: f"{opname} {arg1}, {arg2}\n\t"
         
     if register_allocation:
         def check_variable1(var):
@@ -57,8 +57,8 @@ def print_riscv_instruction(instruction,register_allocation=False):
             if int(var) > 10:
                 return load_stack(var, 'a1')
             else:
-                current_register = "s"+register_numb(var)
-                save_register = "LD " +"s"+register_numb(var)+ " " + stack(var) + "\n\t"
+                current_register = f"s{register_numb(var)}"
+                save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
                 return save_register
 
         def check_variable2(var):
@@ -66,7 +66,7 @@ def print_riscv_instruction(instruction,register_allocation=False):
             if int(var) > 10:
                 return load_stack(var, 'a2')
             else:
-                save_register = "LD " +"s"+register_numb(var)+ " " + stack(var) + "\n\t"
+                save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
                 return save_register
 
         def check_binary_op(var, operator):
@@ -76,7 +76,7 @@ def print_riscv_instruction(instruction,register_allocation=False):
             if int(var) > 10:
                 return binaryop('a1','a1','a2', operator)
             else:
-                return binaryop("s"+register3_numb(var), "s"+register1_numb(var), "s"+register2_numb(var), operator)
+                return binaryop(f"s{register3_numb(var)}", f"s{register1_numb(var)}", f"s{register2_numb(var)}", operator)
 
         def check_unary_opGE(var, operator):
             register1_numb = lambda i : str(int(i) + 1)
@@ -84,7 +84,7 @@ def print_riscv_instruction(instruction,register_allocation=False):
             if int(var) > 10:
                 return unaryop('a3','a1',operator)
             else:
-                return unaryop("s"+register2_numb(var), "s"+register1_numb(var), operator)
+                return unaryop(f"s{register2_numb(var)}", f"s{register1_numb(var)}", operator)
 
         def check_binary_opE(var):
             register1_numb = lambda i : str(int(i) + 1)
@@ -99,10 +99,10 @@ def print_riscv_instruction(instruction,register_allocation=False):
                 unaryop('a1','a2','NOT')
                 return instruction_set
             else:
-                instruction_set = binaryop("s"+register3_numb(var),"s"+register1_numb(var),"s"+register2_numb(var),'SLT') + \
-                binaryop("s"+register4_numb(var),"s"+register1_numb(var),"s"+register2_numb(var),'SGT') + \
-                binaryop("s"+register2_numb(var),"s"+register3_numb(var),"s"+register4_numb(var),'XOR') + \
-                unaryop("s"+register1_numb(var),"s"+register2_numb(var),'NOT')
+                instruction_set = binaryop(f"s{register3_numb(var)}",f"s{register1_numb(var)}",f"s{register2_numb(var)}",'SLT') + \
+                binaryop(f"s{register4_numb(var)}",f"s{register1_numb(var)}",f"s{register2_numb(var)}",'SGT') + \
+                binaryop(f"s{register2_numb(var)}",f"s{register3_numb(var)}",f"s{register4_numb(var)}",'XOR') + \
+                unaryop(f"s{register1_numb(var)}",f"s{register2_numb(var)}",'NOT')
                 return instruction_set
 
         def check_unary_opNOT(var, operator):
@@ -110,21 +110,21 @@ def print_riscv_instruction(instruction,register_allocation=False):
             if int(var) > 10:
                 return unaryop('a1','a1',operator)
             else:
-                return unaryop("s"+register1_numb(var), "s"+register1_numb(var), operator)
+                return unaryop(f"s{register1_numb(var)}", f"s{register1_numb(var)}", operator)
 
         def check_unary_opLI(var, operator):
             register1_numb = lambda i : str(int(i) + 1)
             if int(var) > 10:
                 return unaryop('a1',var,operator)
             else:
-                return unaryop("s"+register1_numb(var), var, operator)
+                return unaryop(f"s{register1_numb(var)}", var, operator)
 
         def store_output(var): 
             register_numb = lambda i : str(int(i) + 1)
             if int(var) > 10:
                 return save_stack(var, 'a1')
             else:
-                save_register = "SD " +"s"+register_numb(var)+ " " + stack(var) + "\n\t"
+                save_register = f"SD s{register_numb(var)} {stack(var)}\n\t"
                 return save_register
 
         if op in binaryops: 
@@ -199,7 +199,7 @@ def print_riscv_instruction(instruction,register_allocation=False):
             riscv = load_stack(i0,'a1') +         save_stack(output,'a1')
 
         elif op == 'Jump':
-            riscv = 'JAL x0, ' + i0 + '\n\t'
+            riscv = f'JAL x0, {i0}\n\t'
 
         else: assert False, 'operation not found'
 
