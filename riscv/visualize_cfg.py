@@ -1,4 +1,4 @@
-import graphviz
+import graphviz as gv
 
 def visualize(cfg,savepath,save=False):
     dot=gv.Digraph(name=savepath,
