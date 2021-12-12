@@ -8,3 +8,5 @@ bin/
 .cache/
 .ipynb_checkpoints/
 package/
+__pycache__/
+*.pyc
