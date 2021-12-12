@@ -199,8 +199,8 @@ def print_riscv_instruction(instruction,register_allocation=False):
 def print_run_imp_actual(instructions,name,fold_const,elim,register_allocation):
     run_imp_actual = 'run_imp_actual:\n\t'
     if fold_const:
-        cfg=make_cfg('../programs/'+name)
-        _,varmap=load_il('../programs/'+name)
+        cfg=make_cfg(name)
+        _,varmap=load_il(+name)
         allvars=list(varmap)
         iteration_function=iterate_reaching_definitions
         rd_iterations= fixed_point_iteration(iteration_function,cfg=cfg,allvars=allvars)
