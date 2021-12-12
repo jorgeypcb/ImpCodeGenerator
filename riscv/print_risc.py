@@ -332,6 +332,10 @@ def process_args(args):
         elif arg.endswith(".imp"):
             impFile = arg
             baseFile = arg.removesuffix(".imp")
+        # If in's not an option, nd it doesn't end with one of the three above
+        # extensions, interpret it as the base filename
+        elif not arg.startswith("--"):
+            baseFile = arg
 
     # Print the help message and exit if --help was passed,
     # or if no file was specified
