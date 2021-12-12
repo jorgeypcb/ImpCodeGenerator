@@ -42,7 +42,7 @@ run_imp:
 
 def print_riscv_instruction(instruction, allocRegisters=False):
     op, i0, i1 = instruction[:3]    #assigns the instruction components
-    output = instruction[3].strip('\n\t')
+    output = instruction[3].strip('\n').strip('\t')
     binaryops = {
         'Plus': 'ADD',
         'Minus': 'SUB',
@@ -54,10 +54,10 @@ def print_riscv_instruction(instruction, allocRegisters=False):
     jumpops = {'JumpIfZero': 'BEQZ', 'JumpIfNonzero': 'BNEZ'}
 
     stack = lambda i: f"{8*int(i)}(a0)"    #converts stack index
-    load_stack = lambda i, a: f"LD {a}, {stack(i)}\n\t"    #load ith value from stack to register a
-    save_stack = lambda i, a: f"SD {a}, {stack(i)}\n\t"    #save register a to ith index in stack
-    binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}\n\t"    #perform operation a1 op a2, put result in output register
-    unaryop = lambda arg1, arg2, opname: f"{opname} {arg1}, {arg2}\n\t"
+    load_stack = lambda i, a: f"LD {a}, {stack(i)}"    #load ith value from stack to register a
+    save_stack = lambda i, a: f"SD {a}, {stack(i)}"    #save register a to ith index in stack
+    binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}"    #perform operation a1 op a2, put result in output register
+    unaryop = lambda arg1, arg2, opname: f"{opname} {arg1}, {arg2}"
 
     if allocRegisters:
 
@@ -67,7 +67,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 return load_stack(var, 'a1')
             else:
                 current_register = f"s{register_numb(var)}"
-                save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
+                save_register = f"LD s{register_numb(var)} {stack(var)}"
                 return ""
 
         def check_variable2(var):
@@ -75,7 +75,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             if int(var) > 10:
                 return load_stack(var, 'a2')
             else:
-                save_register = f"LD s{register_numb(var)} {stack(var)}\n\t"
+                save_register = f"LD s{register_numb(var)} {stack(var)}"
                 return ""
 
         def check_binary_op(var, var1, output, operator):
@@ -147,7 +147,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 return unaryop('a1', var, operator)
             else:
                 return unaryop(f"s{register1_numb(var)}", var, operator)
-            
+
         def check_unary_opJump(var, var1, operator):
             register1_numb = lambda i: str(int(i) + 1)
             if int(var) > 10:
@@ -160,7 +160,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             if int(var) > 10:
                 return save_stack(var, 'a1')
             else:
-                #save_register = f"SD s{register_numb(var)} {stack(var)}\n\t"
+                #save_register = f"SD s{register_numb(var)} {stack(var)}"
                 return ""
 
         if op in binaryops:
@@ -205,7 +205,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             riscv = ''.join([check_unary_opLI(i0, 'LI'), store_output(output)])
 
         elif op == 'Label':
-            riscv = i0 + '\n\t'
+            riscv = i0
 
         elif op == 'Move':
             riscv = ''.join([check_variable1(i0), store_output(output)])
@@ -260,18 +260,30 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             riscv = unaryop('a1', i0, 'LI') + save_stack(output, 'a1')
 
         elif op == 'Label':
-            riscv = i0 + ':\n\t'
+            riscv = i0 + ':'
 
         elif op == 'Move':
             riscv = load_stack(i0, 'a1') + save_stack(output, 'a1')
 
         elif op == 'Jump':
-            riscv = f'JAL x0, {i0}\n\t'
+            riscv = f'JAL x0, {i0}'
 
         else:
             assert False, 'operation not found'
 
         return riscv
+
+
+def load_vars(n: int):
+    if n > 11:
+        n = 11
+    return '\n\t'.join([f'LD s{i + 1}, {8 * i}(a0)' for i in range(n)])
+
+
+def save_vars(n: int):
+    if n > 11:
+        n = 11
+    return '\n\t'.join([f'SD s{i + 1}, {8 * i}(a0)' for i in range(n)])
 
 
 def print_run_imp_actual(insFile,
@@ -282,7 +294,10 @@ def print_run_imp_actual(insFile,
                          printOptimizedIR):
     with open(insFile, 'r') as file:
         instructions = [o.split(' ') for o in file.readlines()]
-    run_imp_actual = 'run_imp_actual:\n\t'
+    with open(varFile, 'r') as file:
+        numVars = len(file.readlines())
+
+    run_imp_actual = ''
     if foldConstants:
         cfg = make_cfg(insFile, varFile)
         _, varmap = load_il(insFile, varFile)
@@ -300,17 +315,34 @@ def print_run_imp_actual(insFile,
             cleanup, init_instr=instructions, varmap=varmap)
         instructions = cleanup_iter[list(cleanup_iter)[-1]]
 
-
     if printOptimizedIR:
-        optIR = '\n'.join([' '.join(ins) for ins in instructions])
+        optIR = '\n'.join(['\t'.join(ins).strip() for ins in instructions])
         print(optIR)
         print("---")
+    body = '\n\t'.join(
+        [print_riscv_instruction(i, allocRegisters) for i in instructions])
 
-    for i in instructions:
-        run_imp_actual += print_riscv_instruction(i, allocRegisters)
-    run_imp_actual += 'ret'
-    return run_imp_actual
+    # If we allocate registers, then we have to load vars before the body,
+    # And save vars after the body.
+    # Otherwise we just print the body.
+    if allocRegisters:
+        return f"""
+.globl run_imp_actual
 
+; Number of variables in imp program: {numVars}
+
+run_imp_actual:
+	{load_vars(numVars)}
+	{body}
+	{save_vars(numVars)}
+	ret"""
+    else:
+        return f"""
+.globl run_imp_actual
+
+run_imp_actual:
+	{body}
+	ret"""
 
 # Usage: run with sys.argv
 def process_args(args):
@@ -375,5 +407,3 @@ Options:
 
 if __name__ == '__main__':
     process_args(sys.argv)
-
-
