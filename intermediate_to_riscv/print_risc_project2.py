@@ -40,7 +40,7 @@ run_imp:
 '''
 
 
-def print_riscv_instruction(instruction, register_allocation=False):
+def print_riscv_instruction(instruction, allocRegisters=False):
     op, i0, i1 = instruction[:3]    #assigns the instruction components
     output = instruction[3].strip('\n\t')
     binaryops = {
@@ -59,7 +59,7 @@ def print_riscv_instruction(instruction, register_allocation=False):
     binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}\n\t"    #perform operation a1 op a2, put result in output register
     unaryop = lambda arg1, arg2, opname: f"{opname} {arg1}, {arg2}\n\t"
 
-    if register_allocation:
+    if allocRegisters:
 
         def check_variable1(var):
             register_numb = lambda i: str(int(i) + 1)
@@ -269,45 +269,45 @@ def print_riscv_instruction(instruction, register_allocation=False):
         return riscv
 
 
-def print_run_imp_actual(insname,
-                         varsname,
-                         fold_const,
-                         elim,
-                         register_allocation):
-    with open(insname, 'r') as file:
+def print_run_imp_actual(insFile,
+                         varFile,
+                         foldConstants,
+                         elimDeadCode,
+                         allocRegisters):
+    with open(insFile, 'r') as file:
         instructions = [o.split(' ') for o in file.readlines()]
     run_imp_actual = 'run_imp_actual:\n\t'
-    if fold_const:
-        cfg = make_cfg(insname, varsname)
-        _, varmap = load_il(insname, varsname)
+    if foldConstants:
+        cfg = make_cfg(insFile, varFile)
+        _, varmap = load_il(insFile, varFile)
         allvars = list(varmap)
         iteration_function = iterate_reaching_definitions
         rd_iterations = fixed_point_iteration(
             iteration_function, cfg=cfg, allvars=allvars)
         rd_final = rd_iterations[list(rd_iterations)[-1]]
         instructions = fixed_point_iteration(
-            fold, cfg=cfg, rd=rd_final, insname=insname, varsname=varsname)
+            fold, cfg=cfg, rd=rd_final, insFile=insFile, varsFile=varFile)
         instructions = instructions[list(instructions)[-1]]
-    if elim:
-        _, varmap = load_il(insname, varsname)
+    if elimDeadCode:
+        _, varmap = load_il(insFile, varFile)
         cleanup_iter = fixed_point_iteration(
             cleanup, init_instr=instructions, varmap=varmap)
         instructions = cleanup_iter[list(cleanup_iter)[-1]]
     for i in instructions:
-        run_imp_actual += print_riscv_instruction(i, register_allocation)
+        run_imp_actual += print_riscv_instruction(i, allocRegisters)
     run_imp_actual += 'ret'
     return run_imp_actual
 
 
 # Usage: run with sys.argv
 def process_args(args):
-    program_name = args[0]
-    args_set = set(args)
+    programName = args[0]
+    argsSet = set(args)
 
-    foldConstants = "--enable_constant_folding" in args_set
-    elimDeadCode = "--enable_dead_code_elim" in args_set
-    allocRegisters = "--enable_register_allocation" in args_set
-    printHelp = "--help" in args_set
+    foldConstants = "--constant_folding" in argsSet
+    elimDeadCode = "--dead_code_elim" in argsSet
+    allocRegisters = "--register_allocation" in argsSet
+    printHelp = "--help" in argsSet
 
     baseFile = ""
     impFile = ""
@@ -329,14 +329,14 @@ def process_args(args):
     if (not baseFile) or printHelp:
         print(f"""Usage:
 
-    {program_name} <ins file name> <vars_file_name> options...
+    {programName} <ins file name> <vars_file_name> options...
     
 Options:
 
-    --enable_constant_folding      # Fold constants
-    --enable_dead_code_elim        # Eliminate dead code
-    --enable_register_allocation   # Allocate registers for variables
-    --help                         # Print this message
+    --constant_folding      # Fold constants
+    --dead_code_elim        # Eliminate dead code
+    --register_allocation   # Allocate registers for variables
+    --help                  # Print this message
     
 """)
         return
@@ -350,11 +350,11 @@ Options:
         varsFile = baseFile + ".vars"
 
     output = print_run_imp_actual(
-        insname=insFile,
-        varsname=varsFile,
-        fold_const=foldConstants,
-        elim=elimDeadCode,
-        register_allocation=allocRegisters)
+        insFile=insFile,
+        varFile=varsFile,
+        foldConstants=foldConstants,
+        elimDeadCode=elimDeadCode,
+        allocRegisters=allocRegisters)
     print(output)
 
 

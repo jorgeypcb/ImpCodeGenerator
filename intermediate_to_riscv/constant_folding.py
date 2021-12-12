@@ -15,9 +15,9 @@ def fold(instructions_=None,**kwargs):
     cfg=kwargs['cfg']
     rd=kwargs['rd']
 #     program_name=kwargs['program_name']
-    insname=kwargs['insname']
-    varsname=kwargs['varsname']
-    _,varmap=load_il(insname,varsname)
+    insFile=kwargs['insFile']
+    varsFile=kwargs['varsFile']
+    _,varmap=load_il(insFile,varsFile)
     if instructions is None: return _
     stackmap={varmap[i]:i for i in varmap}
     labels=list(cfg)

@@ -56,11 +56,11 @@ def print_ins(ins):
     fill=lambda x, width: x+empty(space(x,width))
     for i in ins:print(fill(i[0],12),'\t',fill(i[1],6),'\t',fill(i[2],6),'\t',fill(i[3],6),'\t',fill(i[4].strip('\n'),6))        
 
-def load_il(insname,varsname):
-    with open(insname,'r') as f:
+def load_il(insFile,varsFile):
+    with open(insFile,'r') as f:
         operations=f.readlines()
         instructions=[o.split(' ') for o in operations]
-    with open(varsname,'r') as f:
+    with open(varsFile,'r') as f:
         v=f.readlines()
         v=[i.split(' ') for i in v]
         stack_var_map={i[0]:i[1].strip('\n') for i in v}

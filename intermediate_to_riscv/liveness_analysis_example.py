@@ -6,8 +6,8 @@ import copy
 import sys
 
 args=sys.argv[1:]
-insname,varsname=args
-cfg=make_cfg(insname,varsname)
+insFile,varsFile=args
+cfg=make_cfg(insFile,varsFile)
 iteration_function=iterate_liveness
 liveness_iterations= fixed_point_iteration(iteration_function,cfg=cfg)
 

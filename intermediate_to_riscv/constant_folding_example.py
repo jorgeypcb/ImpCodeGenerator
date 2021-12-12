@@ -7,15 +7,15 @@ import copy
 import sys
 
 args=sys.argv[1:]
-insname,varsname=args
-cfg=make_cfg(insname,varsname)
-_,varmap=load_il(insname,varsname)
+insFile,varsFile=args
+cfg=make_cfg(insFile,varsFile)
+_,varmap=load_il(insFile,varsFile)
 allvars=list(varmap)
 iteration_function=iterate_reaching_definitions
 rd_iterations= fixed_point_iteration(iteration_function,cfg=cfg,allvars=allvars)
 rd_final=rd_iterations[list(rd_iterations)[-1]]    
 
-instructions=fixed_point_iteration(fold,cfg=cfg,rd=rd_final,insname=insname,varsname=varsname)
+instructions=fixed_point_iteration(fold,cfg=cfg,rd=rd_final,insFile=insFile,varsFile=varsFile)
 for ni,i in enumerate(instructions):
     if ni==0: print('init len',len(instructions[i]),'\n')
     print('\n',i,'\n')

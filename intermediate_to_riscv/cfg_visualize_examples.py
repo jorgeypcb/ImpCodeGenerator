@@ -2,6 +2,6 @@ from cfg import*
 import sys
 
 args=sys.argv[1:]
-insname,varsname,savepath=args
-c=make_cfg(insname,varsname)
+insFile,varsFile,savepath=args
+c=make_cfg(insFile,varsFile)
 visualize(c,savepath,True)

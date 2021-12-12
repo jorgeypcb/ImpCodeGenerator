@@ -1,10 +1,10 @@
 import graphviz as gv
 from il_utils import *
 
-def make_cfg(insname,varsname,printIns=False):    
+def make_cfg(insFile,varsFile,printIns=False):    
     cfg={}
     #load all instructions
-    instructions,varmap=load_il(insname,varsname)
+    instructions,varmap=load_il(insFile,varsFile)
 
     gen_ins=('Plus','Minus','Times','Greater','And','Or','GreaterEq','Equal','Not','Move')
     

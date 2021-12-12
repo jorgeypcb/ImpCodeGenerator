@@ -6,9 +6,9 @@ import copy
 import sys
 
 args=sys.argv[1:]
-insname,varsname=args
-cfg=make_cfg(insname,varsname)
-instructions,varmap=load_il(insname,varsname)  
+insFile,varsFile=args
+cfg=make_cfg(insFile,varsFile)
+instructions,varmap=load_il(insFile,varsFile)  
 
 cleanup_iter=fixed_point_iteration(cleanup,init_instr=instructions,varmap=varmap)
 for i in cleanup_iter:

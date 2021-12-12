@@ -7,9 +7,9 @@ import sys
 
 args=sys.argv[1:]
 
-insname,varsname=args
-cfg=make_cfg(insname,varsname)
-instructions,varmap=load_il(insname,varsname)
+insFile,varsFile=args
+cfg=make_cfg(insFile,varsFile)
+instructions,varmap=load_il(insFile,varsFile)
 allvars=list(varmap)
 iteration_function=iterate_reaching_definitions
 rd_iterations= fixed_point_iteration(iteration_function,cfg=cfg,allvars=allvars)
