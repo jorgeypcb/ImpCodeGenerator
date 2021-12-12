@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import sys
 from cfg import*
 from il_utils import*
@@ -203,7 +205,9 @@ def print_riscv_instruction(instruction,register_allocation=False):
 
         return riscv
 
-def print_run_imp_actual(instructions,insname,varsname,fold_const,elim,register_allocation):
+def print_run_imp_actual(insname,varsname,fold_const,elim,register_allocation):
+    with open(insname, 'r') as file:
+        instructions = [o.split(' ') for o in file.readlines()]
     run_imp_actual = 'run_imp_actual:\n\t'
     if fold_const:
         cfg=make_cfg(insname,varsname)
@@ -219,16 +223,67 @@ def print_run_imp_actual(instructions,insname,varsname,fold_const,elim,register_
         cleanup_iter=fixed_point_iteration(cleanup,init_instr=instructions,varmap=varmap)
         instructions=cleanup_iter[list(cleanup_iter)[-1]]
     for i in instructions:
-        run_imp_actual+=print_riscv_instruction(i)
+        run_imp_actual+=print_riscv_instruction(i, register_allocation)
     run_imp_actual += 'ret'
     return run_imp_actual
-    
-with open(str(sys.argv[1]), 'r') as f:
-    insname=sys.argv[1]
-    operations = f.readlines()
-    instructions = [o.split(' ') for o in operations]
-    
-varsname,fold_const,elim,register_allocation=sys.argv[2:]
 
-print(print_run_imp_actual(instructions,insname,varsname,fold_const,elim,register_allocation))
-print(run_imp)
+# Usage: run with sys.argv
+def process_args(args):
+    program_name = args[0]
+    args_set = set(args)
+    
+    foldConstants = "--enable_constant_folding" in args_set
+    elimDeadCode = "--enable_dead_code_elim" in args_set
+    allocRegisters = "--enable_register_allocation" in args_set
+    printHelp = "--help" in args_set
+    
+    baseFile = ""
+    impFile = ""
+    insFile = ""
+    varsFile = ""
+    for arg in args[1:]:
+        if arg.endswith(".ins"):
+            insFile = arg
+            baseFile = arg.removesuffix(".ins")
+        elif arg.endswith(".vars"):
+            varsFile = arg
+            baseFile = arg.removesuffix(".vars")
+        elif arg.endswith(".imp"):
+            impFile = arg
+            baseFile = arg.removesuffix(".imp")
+    
+    # Print the help message and exit if --help was passed,
+    # or if no file was specified
+    if (not baseFile) or printHelp:
+        print(f"""Usage:
+
+    {program_name} <ins file name> <vars_file_name> options...
+    
+Options:
+
+    --enable_constant_folding      # Fold constants
+    --enable_dead_code_elim        # Eliminate dead code
+    --enable_register_allocation   # Allocate registers for variables
+    --help                         # Print this message
+    
+""")
+        return
+    
+    # Use the base file if any of these three aren't specified
+    if not impFile:
+        impFile = baseFile + ".imp"
+    if not insFile:
+        insFile = baseFile + ".ins"
+    if not varsFile:
+        varsFile = baseFile + ".vars"
+    
+    output = print_run_imp_actual(
+        insname = insFile,
+        varsname = varsFile,
+        fold_const = foldConstants,
+        elim = elimDeadCode,
+        register_allocation = allocRegisters)
+    print(output)
+    
+if __name__ == '__main__':
+    process_args(sys.argv)
