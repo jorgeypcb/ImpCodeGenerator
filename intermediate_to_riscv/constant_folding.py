@@ -14,8 +14,10 @@ def fold(instructions_=None,**kwargs):
     instructions=copy.deepcopy(instructions_)
     cfg=kwargs['cfg']
     rd=kwargs['rd']
-    program_name=kwargs['program_name']
-    _,varmap=load_il(program_name)
+#     program_name=kwargs['program_name']
+    insname=kwargs['insname']
+    varsname=kwargs['varsname']
+    _,varmap=load_il(insname,varsname)
     if instructions is None: return _
     stackmap={varmap[i]:i for i in varmap}
     labels=list(cfg)

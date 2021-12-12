@@ -3,8 +3,11 @@ from cfg import*
 from fixed_point_iterator import*
 from liveness_analysis import*
 import copy
+import sys
 
-cfg=make_cfg('../programs/arith')
+args=sys.argv[1:]
+insname,varsname=args
+cfg=make_cfg(insname,varsname)
 iteration_function=iterate_liveness
 liveness_iterations= fixed_point_iteration(iteration_function,cfg=cfg)
 

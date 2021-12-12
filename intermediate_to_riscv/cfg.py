@@ -1,10 +1,10 @@
 import graphviz as gv
 from il_utils import *
 
-def make_cfg(fname,printIns=False):    
+def make_cfg(insname,varsname,printIns=False):    
     cfg={}
     #load all instructions
-    instructions,varmap=load_il(fname)
+    instructions,varmap=load_il(insname,varsname)
 
     gen_ins=('Plus','Minus','Times','Greater','And','Or','GreaterEq','Equal','Not','Move')
     
@@ -40,8 +40,8 @@ def make_cfg(fname,printIns=False):
 
     return cfg
 
-def visualize(cfg,cfg_name,save=False):
-    dot=gv.Digraph(name=cfg_name,
+def visualize(cfg,savepath,save=False):
+    dot=gv.Digraph(name=savepath,
                    graph_attr={'bgcolor':'#24283B','pad':'0.5'},
                   node_attr={'fontsize':'12','fontcolor':'#ffffff','color':'#E0AF68','fontname':'Hack, monospace','shape':'underline'},
                   edge_attr={'color':'#E0AF68','arrowsize':'0.5','fontcolor':'#ffffff','fontsize':'12'})
@@ -53,5 +53,5 @@ def visualize(cfg,cfg_name,save=False):
     for l in cfg:
         for node_name,edge_name in zip(cfg[l]['succ'],cfg[l]['succ_labels']):  
             dot.edge(name(l),name(node_name),label=edge_name)
-    if save: dot.render('../programs/dot-files/'+cfg_name+'.dot')
+    if save: dot.render(savepath)
     return dot

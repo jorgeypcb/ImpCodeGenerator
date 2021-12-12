@@ -1,4 +1,11 @@
 import sys
+from cfg import*
+from il_utils import*
+from reaching_definitions import*
+from fixed_point_iterator import*
+from dead_code_elimination import*
+from constant_folding import*
+import copy
 
 run_imp = '''
 .globl run_imp_actual
@@ -196,19 +203,19 @@ def print_riscv_instruction(instruction,register_allocation=False):
 
         return riscv
 
-def print_run_imp_actual(instructions,name,fold_const,elim,register_allocation):
+def print_run_imp_actual(instructions,insname,varsname,fold_const,elim,register_allocation):
     run_imp_actual = 'run_imp_actual:\n\t'
     if fold_const:
-        cfg=make_cfg(name)
-        _,varmap=load_il(+name)
+        cfg=make_cfg(insname,varsname)
+        _,varmap=load_il(insname,varsname)
         allvars=list(varmap)
         iteration_function=iterate_reaching_definitions
         rd_iterations= fixed_point_iteration(iteration_function,cfg=cfg,allvars=allvars)
         rd_final=rd_iterations[list(rd_iterations)[-1]]    
-        instructions=fixed_point_iteration(fold,cfg=cfg,rd=rd_final,program_name=name)
+        instructions=fixed_point_iteration(fold,cfg=cfg,rd=rd_final,insname=insname,varsname=varsname)
         instructions=instructions[list(instructions)[-1]]
     if elim:
-        _,varmap=load_il(name)
+        _,varmap=load_il(insname,varsname)
         cleanup_iter=fixed_point_iteration(cleanup,init_instr=instructions,varmap=varmap)
         instructions=cleanup_iter[list(cleanup_iter)[-1]]
     for i in instructions:
@@ -216,12 +223,12 @@ def print_run_imp_actual(instructions,name,fold_const,elim,register_allocation):
     run_imp_actual += 'ret'
     return run_imp_actual
     
-with open(str(sys.argv[1]+'.ins'), 'r') as f:
-    name=sys.argv[1]
+with open(str(sys.argv[1]), 'r') as f:
+    insname=sys.argv[1]
     operations = f.readlines()
     instructions = [o.split(' ') for o in operations]
     
-fold_const,elim,register_allocation=sys.argv[2:]
+varsname,fold_const,elim,register_allocation=sys.argv[2:]
 
-print(print_run_imp_actual(instructions,name,fold_const,elim,register_allocation))
+print(print_run_imp_actual(instructions,insname,varsname,fold_const,elim,register_allocation))
 print(run_imp)

@@ -3,10 +3,12 @@ from il_utils import*
 from fixed_point_iterator import*
 from dead_code_elimination import*
 import copy
+import sys
 
-name='../programs/dead-code-test-2'
-cfg=make_cfg(name)
-instructions,varmap=load_il(name)  
+args=sys.argv[1:]
+insname,varsname=args
+cfg=make_cfg(insname,varsname)
+instructions,varmap=load_il(insname,varsname)  
 
 cleanup_iter=fixed_point_iteration(cleanup,init_instr=instructions,varmap=varmap)
 for i in cleanup_iter:

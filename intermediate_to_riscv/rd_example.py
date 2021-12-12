@@ -3,10 +3,13 @@ from cfg import*
 from fixed_point_iterator import*
 from reaching_definitions import*
 import copy
+import sys
 
-name='../programs/factorial'
-cfg=make_cfg(name)
-instructions,varmap=load_il(name)
+args=sys.argv[1:]
+
+insname,varsname=args
+cfg=make_cfg(insname,varsname)
+instructions,varmap=load_il(insname,varsname)
 allvars=list(varmap)
 iteration_function=iterate_reaching_definitions
 rd_iterations= fixed_point_iteration(iteration_function,cfg=cfg,allvars=allvars)
