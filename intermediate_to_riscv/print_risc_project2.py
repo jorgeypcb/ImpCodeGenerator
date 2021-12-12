@@ -41,7 +41,7 @@ run_imp:
 
 
 def print_riscv_instruction(instruction, register_allocation=False):
-    op, i0, i1 = instruction[:3]  #assigns the instruction components
+    op, i0, i1 = instruction[:3]    #assigns the instruction components
     output = instruction[3].strip('\n\t')
     binaryops = {
         'Plus': 'ADD',
@@ -53,10 +53,10 @@ def print_riscv_instruction(instruction, register_allocation=False):
     }
     jumpops = {'JumpIfZero': 'BEQZ', 'JumpIfNonzero': 'BNEZ'}
 
-    stack = lambda i: f"{8*int(i)}(a0)"  #converts stack index
-    load_stack = lambda i, a: f"LD {a}, {stack(i)}\n\t"  #load ith value from stack to register a
-    save_stack = lambda i, a: f"SD {a}, {stack(i)}\n\t"  #save register a to ith index in stack
-    binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}\n\t"  #perform operation a1 op a2, put result in output register
+    stack = lambda i: f"{8*int(i)}(a0)"    #converts stack index
+    load_stack = lambda i, a: f"LD {a}, {stack(i)}\n\t"    #load ith value from stack to register a
+    save_stack = lambda i, a: f"SD {a}, {stack(i)}\n\t"    #save register a to ith index in stack
+    binaryop = lambda out_reg, ai, aj, opname: f"{opname} {out_reg}, {ai}, {aj}\n\t"    #perform operation a1 op a2, put result in output register
     unaryop = lambda arg1, arg2, opname: f"{opname} {arg1}, {arg2}\n\t"
 
     if register_allocation:
@@ -87,7 +87,8 @@ def print_riscv_instruction(instruction, register_allocation=False):
             else:
                 return binaryop(f"s{register3_numb(var)}",
                                 f"s{register1_numb(var)}",
-                                f"s{register2_numb(var)}", operator)
+                                f"s{register2_numb(var)}",
+                                operator)
 
         def check_unary_opGE(var, operator):
             register1_numb = lambda i: str(int(i) + 1)
@@ -96,7 +97,8 @@ def print_riscv_instruction(instruction, register_allocation=False):
                 return unaryop('a3', 'a1', operator)
             else:
                 return unaryop(f"s{register2_numb(var)}",
-                               f"s{register1_numb(var)}", operator)
+                               f"s{register1_numb(var)}",
+                               operator)
 
         def check_binary_opE(var):
             register1_numb = lambda i: str(int(i) + 1)
@@ -105,17 +107,32 @@ def print_riscv_instruction(instruction, register_allocation=False):
             register4_numb = lambda i: str(int(i) + 4)
 
             if int(var) > 10:
-                instruction_set = binaryop('a3','a1','a2','SLT') + \
-                binaryop('a4','a1','a2','SGT') + \
-                binaryop('a2','a3','a4','XOR') + \
-                unaryop('a1','a2','NOT')
-                return instruction_set
+                instruction_set = [
+                    binaryop('a3', 'a1', 'a2', 'SLT'),
+                    binaryop('a4', 'a1', 'a2', 'SGT'),
+                    binaryop('a2', 'a3', 'a4', 'XOR'),
+                    unaryop('a1', 'a2', 'NOT')
+                ]
+                return ''.join(instruction_set)
             else:
-                instruction_set = binaryop(f"s{register3_numb(var)}",f"s{register1_numb(var)}",f"s{register2_numb(var)}",'SLT') + \
-                binaryop(f"s{register4_numb(var)}",f"s{register1_numb(var)}",f"s{register2_numb(var)}",'SGT') + \
-                binaryop(f"s{register2_numb(var)}",f"s{register3_numb(var)}",f"s{register4_numb(var)}",'XOR') + \
-                unaryop(f"s{register1_numb(var)}",f"s{register2_numb(var)}",'NOT')
-                return instruction_set
+                instruction_set = [
+                    binaryop(f"s{register3_numb(var)}",
+                             f"s{register1_numb(var)}",
+                             f"s{register2_numb(var)}",
+                             'SLT'),
+                    binaryop(f"s{register4_numb(var)}",
+                             f"s{register1_numb(var)}",
+                             f"s{register2_numb(var)}",
+                             'SGT'),
+                    binaryop(f"s{register2_numb(var)}",
+                             f"s{register3_numb(var)}",
+                             f"s{register4_numb(var)}",
+                             'XOR'),
+                    unaryop(f"s{register1_numb(var)}",
+                            f"s{register2_numb(var)}",
+                            'NOT')
+                ]
+                return ''.join(instruction_set)
 
         def check_unary_opNOT(var, operator):
             register1_numb = lambda i: str(int(i) + 1)
@@ -123,7 +140,8 @@ def print_riscv_instruction(instruction, register_allocation=False):
                 return unaryop('a1', 'a1', operator)
             else:
                 return unaryop(f"s{register1_numb(var)}",
-                               f"s{register1_numb(var)}", operator)
+                               f"s{register1_numb(var)}",
+                               operator)
 
         def check_unary_opLI(var, operator):
             register1_numb = lambda i: str(int(i) + 1)
@@ -141,43 +159,51 @@ def print_riscv_instruction(instruction, register_allocation=False):
                 return save_register
 
         if op in binaryops:
-            riscv = check_variable1(i0) + \
-            check_variable2(i1) + \
-            check_binary_op(i0, binaryops[op]) + \
-            store_output(output)
+            riscv = ''.join([
+                check_variable1(i0),
+                check_variable2(i1),
+                check_binary_op(i0, binaryops[op]),
+                store_output(output)
+            ])
 
         elif op in jumpops:
-            riscv = check_variable1(i0) + \
-            unaryop('a1',i1,jumpops[op])
+            riscv = ''.join(
+                [check_variable1(i0), unaryop('a1', i1, jumpops[op])])
 
-        elif op == 'GreaterEq':  #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
-            riscv = check_variable1(i0) + \
-            check_variable2(i1) + \
-            check_binary_op(i0, 'SLT') + \
-            check_unary_opGE(i0, 'NOT') + \
-            store_output(output)
+        elif op == 'GreaterEq':
+            #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
+            riscv = ''.join([
+                check_variable1(i0),
+                check_variable2(i1),
+                check_binary_op(i0, 'SLT'),
+                check_unary_opGE(i0, 'NOT'),
+                store_output(output)
+            ])
 
-        elif op == 'Equal':  #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
-            riscv = check_variable1(i0) + \
-            check_variable2(i1) + \
-            check_binary_opE(i0) + \
-            store_output(output)
+        elif op == 'Equal':
+            #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
+            riscv = ''.join([
+                check_variable1(i0),
+                check_variable2(i1),
+                check_binary_opE(i0),
+                store_output(output)
+            ])
 
         elif op == 'Not':
-            riscv = check_variable1(i0) + \
-            check_unary_opNOT(i0,'NOT') + \
-            store_output(output)
+            riscv = ''.join([
+                check_variable1(i0),
+                check_unary_opNOT(i0, 'NOT'),
+                store_output(output)
+            ])
 
         elif op == 'LoadConstant':
-            riscv = check_unary_opLI(i0,'LI') + \
-            store_output(output)
+            riscv = ''.join([check_unary_opLI(i0, 'LI'), store_output(output)])
 
         elif op == 'Label':
             riscv = i0 + '\n\t'
 
         elif op == 'Move':
-            riscv = check_variable1(i0) + \
-            store_output(output)
+            riscv = ''.join([check_variable1(i0), store_output(output)])
 
         elif op == 'Jump':
             riscv = 'JAL x0, ' + i0
@@ -188,27 +214,42 @@ def print_riscv_instruction(instruction, register_allocation=False):
         return riscv
     else:
         if op in binaryops:
-            riscv = load_stack(i0, 'a1') + load_stack(i1, 'a2') + binaryop(
-                'a1', 'a1', 'a2', binaryops[op]) + save_stack(output, 'a1')
+            riscv = ''.join([
+                load_stack(i0, 'a1'),
+                load_stack(i1, 'a2'),
+                binaryop('a1', 'a1', 'a2', binaryops[op]),
+                save_stack(output, 'a1')
+            ])
 
         elif op in jumpops:
             riscv = load_stack(i0, 'a1') + unaryop('a1', i1, jumpops[op])
 
-        elif op == 'GreaterEq':  #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
-            riscv = load_stack(i0, 'a1') + load_stack(i1, 'a2') + binaryop(
-                'a3', 'a1', 'a2', 'SLT') + unaryop(
-                    'a1', 'a3', 'NOT') + save_stack(output, 'a1')
+        elif op == 'GreaterEq':    #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
+            riscv = ''.join([
+                load_stack(i0, 'a1'),
+                load_stack(i1, 'a2'),
+                binaryop('a3', 'a1', 'a2', 'SLT'),
+                unaryop('a1', 'a3', 'NOT'),
+                save_stack(output, 'a1')
+            ])
 
-        elif op == 'Equal':  #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
-            riscv = load_stack(i0, 'a1') + load_stack(i1, 'a2') + binaryop(
-                'a3', 'a1', 'a2', 'SLT') + binaryop(
-                    'a4', 'a1', 'a2', 'SGT') + binaryop(
-                        'a2', 'a3', 'a4', 'XOR') + unaryop(
-                            'a1', 'a2', 'NOT') + save_stack(output, 'a1')
+        elif op == 'Equal':    #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
+            riscv = ''.join([
+                load_stack(i0, 'a1'),
+                load_stack(i1, 'a2'),
+                binaryop('a3', 'a1', 'a2', 'SLT'),
+                binaryop('a4', 'a1', 'a2', 'SGT'),
+                binaryop('a2', 'a3', 'a4', 'XOR'),
+                unaryop('a1', 'a2', 'NOT'),
+                save_stack(output, 'a1')
+            ])
 
         elif op == 'Not':
-            riscv = load_stack(i0, 'a1') + unaryop(
-                'a1', 'a1', 'NOT') + save_stack(output, 'a1')
+            riscv = ''.join([
+                load_stack(i0, 'a1'),
+                unaryop('a1', 'a1', 'NOT'),
+                save_stack(output, 'a1')
+            ])
 
         elif op == 'LoadConstant':
             riscv = unaryop('a1', i0, 'LI') + save_stack(output, 'a1')
@@ -228,7 +269,10 @@ def print_riscv_instruction(instruction, register_allocation=False):
         return riscv
 
 
-def print_run_imp_actual(insname, varsname, fold_const, elim,
+def print_run_imp_actual(insname,
+                         varsname,
+                         fold_const,
+                         elim,
                          register_allocation):
     with open(insname, 'r') as file:
         instructions = [o.split(' ') for o in file.readlines()]
@@ -238,21 +282,16 @@ def print_run_imp_actual(insname, varsname, fold_const, elim,
         _, varmap = load_il(insname, varsname)
         allvars = list(varmap)
         iteration_function = iterate_reaching_definitions
-        rd_iterations = fixed_point_iteration(iteration_function,
-                                              cfg=cfg,
-                                              allvars=allvars)
+        rd_iterations = fixed_point_iteration(
+            iteration_function, cfg=cfg, allvars=allvars)
         rd_final = rd_iterations[list(rd_iterations)[-1]]
-        instructions = fixed_point_iteration(fold,
-                                             cfg=cfg,
-                                             rd=rd_final,
-                                             insname=insname,
-                                             varsname=varsname)
+        instructions = fixed_point_iteration(
+            fold, cfg=cfg, rd=rd_final, insname=insname, varsname=varsname)
         instructions = instructions[list(instructions)[-1]]
     if elim:
         _, varmap = load_il(insname, varsname)
-        cleanup_iter = fixed_point_iteration(cleanup,
-                                             init_instr=instructions,
-                                             varmap=varmap)
+        cleanup_iter = fixed_point_iteration(
+            cleanup, init_instr=instructions, varmap=varmap)
         instructions = cleanup_iter[list(cleanup_iter)[-1]]
     for i in instructions:
         run_imp_actual += print_riscv_instruction(i, register_allocation)
@@ -310,11 +349,12 @@ Options:
     if not varsFile:
         varsFile = baseFile + ".vars"
 
-    output = print_run_imp_actual(insname=insFile,
-                                  varsname=varsFile,
-                                  fold_const=foldConstants,
-                                  elim=elimDeadCode,
-                                  register_allocation=allocRegisters)
+    output = print_run_imp_actual(
+        insname=insFile,
+        varsname=varsFile,
+        fold_const=foldConstants,
+        elim=elimDeadCode,
+        register_allocation=allocRegisters)
     print(output)
 
 
