@@ -7,6 +7,7 @@ def cleanup(instructions_=None,**kwargs):
     varmap=kwargs['varmap']
     instructions=compress_constant_assignments(instructions,varmap)
     instructions=remove_unused_temporary_assignments(instructions,varmap)
+#     instructions=remove_unused_variables(instructions,varmap)
     return instructions
   
 def compress_constant_assignments(instructions,varmap):
@@ -22,9 +23,20 @@ def compress_constant_assignments(instructions,varmap):
 def remove_unused_temporary_assignments(instructions,varmap):
     def keep(idx):
         ins=instructions[:idx]+instructions[idx+1:]
-        return output(instructions[idx]) in [i0(i) for i in ins]+list(varmap)
+        return output(instructions[idx]) in [i0(i) for i in ins if op(i)!='LoadConstant']+list(varmap)
     delete=[]
     for ni,i in enumerate(instructions):
         if op(i)=='LoadConstant':
             if not keep(ni): delete.append(ni)
     return [instructions[i] for i in range(len(instructions)) if i not in delete]
+
+# def remove_unused_variables(instructions,varmap):
+#     stackmap={varmap[i]:i for i in list(varmap)}
+#     def keep(idx):
+#         ins=instructions[:idx]+instructions[idx+1:]
+#         return output(instructions[idx]) in [i0(i) for i in ins if op(i)!='LoadConstant']+[stackmap['output']]
+#     delete=[]
+#     for ni,i in enumerate(instructions):
+#         if op(i)=='LoadConstant':
+#             if not keep(ni): delete.append(ni)
+#     return [instructions[i] for i in range(len(instructions)) if i not in delete]
