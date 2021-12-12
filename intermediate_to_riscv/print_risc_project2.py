@@ -216,7 +216,7 @@ def print_run_imp_actual(instructions,name,fold_const,elim,register_allocation):
     run_imp_actual += 'ret'
     return run_imp_actual
     
-with open(str(sys.argv[1]), 'r') as f:
+with open(str(sys.argv[1]+'.ins'), 'r') as f:
     name=sys.argv[1]
     operations = f.readlines()
     instructions = [o.split(' ') for o in operations]
