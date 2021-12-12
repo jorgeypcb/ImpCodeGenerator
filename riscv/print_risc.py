@@ -273,7 +273,8 @@ def print_run_imp_actual(insFile,
                          varFile,
                          foldConstants,
                          elimDeadCode,
-                         allocRegisters):
+                         allocRegisters,
+                         printOptimizedIR):
     with open(insFile, 'r') as file:
         instructions = [o.split(' ') for o in file.readlines()]
     run_imp_actual = 'run_imp_actual:\n\t'
@@ -293,6 +294,13 @@ def print_run_imp_actual(insFile,
         cleanup_iter = fixed_point_iteration(
             cleanup, init_instr=instructions, varmap=varmap)
         instructions = cleanup_iter[list(cleanup_iter)[-1]]
+
+
+    if printOptimizedIR:
+        optIR = '\n'.join([' '.join(ins) for ins in instructions])
+        print(optIR)
+        print("---")
+
     for i in instructions:
         run_imp_actual += print_riscv_instruction(i, allocRegisters)
     run_imp_actual += 'ret'
@@ -307,6 +315,7 @@ def process_args(args):
     foldConstants = "--constant_folding" in argsSet
     elimDeadCode = "--dead_code_elim" in argsSet
     allocRegisters = "--register_allocation" in argsSet
+    printOptimizedIR = "--print_optimized_ir" in argsSet
     printHelp = "--help" in argsSet
 
     baseFile = ""
@@ -354,7 +363,8 @@ Options:
         varFile=varsFile,
         foldConstants=foldConstants,
         elimDeadCode=elimDeadCode,
-        allocRegisters=allocRegisters)
+        allocRegisters=allocRegisters,
+        printOptimizedIR=printOptimizedIR)
     print(output)
 
 
