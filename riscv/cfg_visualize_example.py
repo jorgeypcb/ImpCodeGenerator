@@ -1,5 +1,5 @@
 from cfg import*
-from vizualize_cfg import*
+from visualize_cfg import*
 import sys
 
 args=sys.argv[1:]
