@@ -325,13 +325,13 @@ def process_args(args):
     for arg in args[1:]:
         if arg.endswith(".ins"):
             insFile = arg
-            baseFile = arg.removesuffix(".ins")
+            baseFile = arg[:-4]
         elif arg.endswith(".vars"):
             varsFile = arg
-            baseFile = arg.removesuffix(".vars")
+            baseFile = arg[:-5]
         elif arg.endswith(".imp"):
             impFile = arg
-            baseFile = arg.removesuffix(".imp")
+            baseFile = arg[:-4]
 
     # Print the help message and exit if --help was passed,
     # or if no file was specified
