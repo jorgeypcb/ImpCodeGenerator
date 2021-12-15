@@ -1,0 +1,13 @@
+LoadConstant 100000000 null 2 1
+Move 2 null 0 1
+Label .LBB_2 null null 2
+LoadConstant 0 null 4 2
+Greater 0 4 2 2
+JumpIfZero 2 .LBB_4 null 2
+Label .LBB_3 null null 3
+LoadConstant 1 null 4 3
+Minus 0 4 2 3
+Move 2 null 0 3
+Jump .LBB_2 null null 3
+Label .LBB_4 null null 4
+Move 0 null 1 4

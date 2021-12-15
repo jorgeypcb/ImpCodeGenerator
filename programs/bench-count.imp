@@ -1,0 +1,7 @@
+
+n := 100000000;
+while n > 0 do
+  n := n - 1
+od;
+output := n
+
