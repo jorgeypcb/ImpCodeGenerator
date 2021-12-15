@@ -336,8 +336,6 @@ def print_run_imp_actual(insFile,
         return f"""
 .globl run_imp_actual
 
-// Number of variables in imp program: {numVars}
-
 run_imp_actual:
 	{load_vars(numVars)}
 	{body}

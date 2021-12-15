@@ -1,8 +1,6 @@
 
 .globl run_imp_actual
 
-// Number of variables in imp program: 6
-
 run_imp_actual:
 	LD s1, 0(a0)
 	LD s2, 8(a0)
