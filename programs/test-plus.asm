@@ -1,7 +1,7 @@
 
 .globl run_imp_actual
 
-; Number of variables in imp program: 3
+// Number of variables in imp program: 3
 
 run_imp_actual:
 	LD s1, 0(a0)

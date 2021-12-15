@@ -1,7 +1,7 @@
 
 .globl run_imp_actual
 
-; Number of variables in imp program: 4
+// Number of variables in imp program: 4
 
 run_imp_actual:
 	LD s1, 0(a0)
@@ -10,8 +10,11 @@ run_imp_actual:
 	LD s4, 24(a0)
 	
 	
-	LI s4, 1
+	LI s5, 1
+	
+	
 	.LBB_3
+	LI s7, 1
 	
 	
 	SGT s5, s3, s7
@@ -25,6 +28,7 @@ run_imp_actual:
 	
 	
 	
+	LI s7, 1
 	
 	
 	SUB s5, s3, s7
@@ -33,8 +37,11 @@ run_imp_actual:
 	
 	JAL x0, .LBB_3
 	.LBB_6
-	LI s3, 0
-	LI s1, 1
+	LI s5, 0
+	
+	
+	
+	
 	SD s1, 0(a0)
 	SD s2, 8(a0)
 	SD s3, 16(a0)
