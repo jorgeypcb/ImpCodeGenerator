@@ -10,8 +10,7 @@ run_imp_actual:
 	LD s4, 24(a0)
 	
 	
-	LI s2, 1
-	
+	LI s4, 1
 	.LBB_3
 	
 	
@@ -34,10 +33,8 @@ run_imp_actual:
 	
 	JAL x0, .LBB_3
 	.LBB_6
-	LI s1, 0
-	
-	
-	
+	LI s3, 0
+	LI s1, 1
 	SD s1, 0(a0)
 	SD s2, 8(a0)
 	SD s3, 16(a0)

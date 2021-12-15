@@ -11,11 +11,8 @@ run_imp_actual:
 	LD s5, 32(a0)
 	LD s6, 40(a0)
 	LI s1, 0
-	
 	LI s2, 1
-	
-	LI s1, 0
-	
+	LI s6, 0
 	.LBB_4
 	
 	
@@ -40,11 +37,10 @@ run_imp_actual:
 	
 	
 	
-	LI s1, 0
-	
+	LI s6, 0
 	JAL x0, .LBB_4
 	.LBB_10
-	LI s1, 0
+	
 	
 	SD s1, 0(a0)
 	SD s2, 8(a0)

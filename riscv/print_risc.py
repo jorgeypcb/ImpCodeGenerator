@@ -202,8 +202,11 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op == 'LoadConstant':
-            riscv = '\n\t'.join(
-                [check_unary_opLI(i0, 'LI'), store_output(output)])
+            if int(output) > 10:
+                riscv = '\n\t'.join(
+                    [f'LI a1, {i0}', f'SD a1, {int(output) * 8}(a0)'])
+            else:
+                riscv = f'LI s{int(output) + 1}, {i0}'
 
         elif op == 'Label':
             riscv = i0

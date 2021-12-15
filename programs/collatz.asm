@@ -12,20 +12,22 @@ run_imp_actual:
 	LD s6, 40(a0)
 	
 	
-	LI s1, 0
-	
+	LI s6, 0
 	.LBB_3
-	LI s1, 0
+	
+	
+	SGT s7, s2, s9
 	
 	
 	BEQZ s7, .LBB_13
 	.LBB_4
-	LI s1, 0
 	
-	LI s1, 0
 	
+	LI s4, 0
 	.LBB_6
-	LI s1, 0
+	
+	
+	SGT s7, s5, s9
 	
 	
 	BEQZ s7, .LBB_9
@@ -36,8 +38,7 @@ run_imp_actual:
 	
 	
 	
-	LI s2, 1
-	
+	LI s4, 1
 	JAL x0, .LBB_6
 	.LBB_9
 	
@@ -49,23 +50,25 @@ run_imp_actual:
 	
 	
 	BEQZ s7, .LBB_11
-	LI s1, 0
-	
+	LI s2, 0
 	JAL x0, .LBB_12
 	.LBB_11
-	LI s4, 3
+	LI s8, 3
+	
+	
+	ADD s9, s2, s11
+	
+	
+	
+	MUL s7, s8, s9
+	
+	
 	
 	.LBB_12
-	
-	
-	ADD s7, s6, s9
-	
-	
-	
+	LI s6, 1
 	JAL x0, .LBB_3
 	.LBB_13
-	
-	
+	LI s3, 0
 	SD s1, 0(a0)
 	SD s2, 8(a0)
 	SD s3, 16(a0)
