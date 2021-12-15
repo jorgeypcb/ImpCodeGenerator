@@ -111,7 +111,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                     binaryop('a2', 'a3', 'a4', 'XOR'),
                     unaryop('a1', 'a2', 'NOT')
                 ]
-                return ''.join(instruction_set)
+                return '\n\t'.join(instruction_set)
             else:
                 instruction_set = [
                     binaryop(f"s{register3_numb(var)}",
@@ -130,7 +130,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                             f"s{register2_numb(var)}",
                             'NOT')
                 ]
-                return ''.join(instruction_set)
+                return '\n\t'.join(instruction_set)
 
         def check_unary_opNOT(var, operator):
             register1_numb = lambda i: str(int(i) + 1)
@@ -164,7 +164,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 return ""
 
         if op in binaryops:
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 check_variable1(i0),
                 check_variable2(i1),
                 check_binary_op(i0, i1, output, binaryops[op]),
@@ -172,12 +172,12 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op in jumpops:
-            riscv = ''.join(
+            riscv = '\n\t'.join(
                 [check_variable1(i0), check_unary_opJump(i0, i1, jumpops[op])])
 
         elif op == 'GreaterEq':
             #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 check_variable1(i0),
                 check_variable2(i1),
                 check_binary_op(i0, 'SLT'),
@@ -187,7 +187,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
 
         elif op == 'Equal':
             #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 check_variable1(i0),
                 check_variable2(i1),
                 check_binary_opE(i0),
@@ -195,20 +195,21 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op == 'Not':
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 check_variable1(i0),
                 check_unary_opNOT(i0, 'NOT'),
                 store_output(output)
             ])
 
         elif op == 'LoadConstant':
-            riscv = ''.join([check_unary_opLI(i0, 'LI'), store_output(output)])
+            riscv = '\n\t'.join(
+                [check_unary_opLI(i0, 'LI'), store_output(output)])
 
         elif op == 'Label':
             riscv = i0
 
         elif op == 'Move':
-            riscv = ''.join([check_variable1(i0), store_output(output)])
+            riscv = '\n\t'.join([check_variable1(i0), store_output(output)])
 
         elif op == 'Jump':
             riscv = 'JAL x0, ' + i0
@@ -219,7 +220,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
         return riscv
     else:
         if op in binaryops:
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 load_stack(i0, 'a1'),
                 load_stack(i1, 'a2'),
                 binaryop('a1', 'a1', 'a2', binaryops[op]),
@@ -227,10 +228,11 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op in jumpops:
-            riscv = load_stack(i0, 'a1') + unaryop('a1', i1, jumpops[op])
+            riscv = '\n\t'.join(
+                [load_stack(i0, 'a1'), unaryop('a1', i1, jumpops[op])])
 
         elif op == 'GreaterEq':    #a3 = (a1 < a2), then a1 = not a3, save a1 to stack output
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 load_stack(i0, 'a1'),
                 load_stack(i1, 'a2'),
                 binaryop('a3', 'a1', 'a2', 'SLT'),
@@ -239,7 +241,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op == 'Equal':    #a3 = (a1 < a2), a4 = (a1 > a2), a2 = (a3 xor a4), a1 = not a2, save a1 to stack output
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 load_stack(i0, 'a1'),
                 load_stack(i1, 'a2'),
                 binaryop('a3', 'a1', 'a2', 'SLT'),
@@ -250,20 +252,22 @@ def print_riscv_instruction(instruction, allocRegisters=False):
             ])
 
         elif op == 'Not':
-            riscv = ''.join([
+            riscv = '\n\t'.join([
                 load_stack(i0, 'a1'),
                 unaryop('a1', 'a1', 'NOT'),
                 save_stack(output, 'a1')
             ])
 
         elif op == 'LoadConstant':
-            riscv = unaryop('a1', i0, 'LI') + save_stack(output, 'a1')
+            riscv = '\n\t'.join(
+                [unaryop('a1', i0, 'LI'), save_stack(output, 'a1')])
 
         elif op == 'Label':
             riscv = i0 + ':'
 
         elif op == 'Move':
-            riscv = load_stack(i0, 'a1') + save_stack(output, 'a1')
+            riscv = '\n\t'.join(
+                [load_stack(i0, 'a1'), save_stack(output, 'a1')])
 
         elif op == 'Jump':
             riscv = f'JAL x0, {i0}'
@@ -343,6 +347,7 @@ run_imp_actual:
 run_imp_actual:
 	{body}
 	ret"""
+
 
 # Usage: run with sys.argv
 def process_args(args):
