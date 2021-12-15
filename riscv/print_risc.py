@@ -209,7 +209,7 @@ def print_riscv_instruction(instruction, allocRegisters=False):
                 riscv = f'LI s{int(output) + 1}, {i0}'
 
         elif op == 'Label':
-            riscv = i0
+            riscv = f'{i0}:'
 
         elif op == 'Move':
             riscv = '\n\t'.join([check_variable1(i0), store_output(output)])

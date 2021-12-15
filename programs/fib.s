@@ -17,14 +17,14 @@ run_imp_actual:
 	LI s7, 0
 	
 	
-	.LBB_4
+	.LBB_4:
 	
 	
 	SGT s7, s3, s6
 	
 	
 	BEQZ s7, .LBB_10
-	.LBB_5
+	.LBB_5:
 	
 	
 	ADD s7, s1, s2
@@ -46,7 +46,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_4
-	.LBB_10
+	.LBB_10:
 	
 	
 	SD s1, 0(a0)

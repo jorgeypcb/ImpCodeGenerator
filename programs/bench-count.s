@@ -7,7 +7,7 @@ run_imp_actual:
 	LI s3, 100000000
 	
 	
-	.LBB_2
+	.LBB_2:
 	LI s5, 0
 	
 	
@@ -15,7 +15,7 @@ run_imp_actual:
 	
 	
 	BEQZ s3, .LBB_4
-	.LBB_3
+	.LBB_3:
 	LI s5, 1
 	
 	
@@ -24,7 +24,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_2
-	.LBB_4
+	.LBB_4:
 	
 	
 	SD s1, 0(a0)

@@ -13,7 +13,7 @@ run_imp_actual:
 	LI s7, 0
 	
 	
-	.LBB_3
+	.LBB_3:
 	LI s9, 1
 	
 	
@@ -21,13 +21,13 @@ run_imp_actual:
 	
 	
 	BEQZ s7, .LBB_13
-	.LBB_4
+	.LBB_4:
 	
 	
 	LI s7, 0
 	
 	
-	.LBB_6
+	.LBB_6:
 	LI s9, 1
 	
 	
@@ -35,7 +35,7 @@ run_imp_actual:
 	
 	
 	BEQZ s7, .LBB_9
-	.LBB_7
+	.LBB_7:
 	LI s9, 2
 	
 	
@@ -51,7 +51,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_6
-	.LBB_9
+	.LBB_9:
 	LI s9, 0
 	
 	
@@ -65,7 +65,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_12
-	.LBB_11
+	.LBB_11:
 	LI s8, 3
 	LI s11, 1
 	
@@ -78,7 +78,7 @@ run_imp_actual:
 	
 	
 	
-	.LBB_12
+	.LBB_12:
 	LI s9, 1
 	
 	
@@ -87,7 +87,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_3
-	.LBB_13
+	.LBB_13:
 	
 	
 	SD s1, 0(a0)

@@ -11,7 +11,7 @@ run_imp_actual:
 	LI s5, 1
 	
 	
-	.LBB_3
+	.LBB_3:
 	LI s7, 1
 	
 	
@@ -19,7 +19,7 @@ run_imp_actual:
 	
 	
 	BEQZ s5, .LBB_6
-	.LBB_4
+	.LBB_4:
 	
 	
 	MUL s5, s4, s3
@@ -34,7 +34,7 @@ run_imp_actual:
 	
 	
 	JAL x0, .LBB_3
-	.LBB_6
+	.LBB_6:
 	LI s5, 0
 	
 	
